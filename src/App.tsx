@@ -1,28 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 
-// Define the shape of the card type
 type CardType = "Duke" | "Captain" | "Assassin" | "Contessa" | "Ambassador";
 
-// Define the shape of each player's state
 interface PlayerState {
   cards: CardType[];
   coins: number;
 }
 
-// Define the shape of the overall state for all players
 interface PlayersState {
   player1: PlayerState;
   player2: PlayerState;
   user: PlayerState;
 }
-// Define the shape of the overall game state
 interface GameState {
   currentPlayer: keyof PlayersState | null;
 }
 
 const App: React.FC = () => {
-  // Define the initial state with types
   const [players, setPlayers] = useState<PlayersState>({
     player1: { cards: [], coins: 2 },
     player2: { cards: [], coins: 2 },
@@ -31,6 +26,10 @@ const App: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>({
     currentPlayer: null,
   });
+  const [incomeTaken, setIncomeTaken] = useState<boolean>(false);
+  const [foreignAidTaken, setforeignAidTaken] = useState<boolean>(false);
+  const [taxTaken, setTaxTaken] = useState<boolean>(false);
+
   const shuffleAndDealCards = (): void => {
     const cardTypes: CardType[] = [
       "Duke",
@@ -51,14 +50,12 @@ const App: React.FC = () => {
     // Shuffle the deck
     deck = deck.sort(() => Math.random() - 0.5);
 
-    // Deal 2 cards to each player
-    const updatedPlayers: PlayersState = JSON.parse(JSON.stringify(players));
-    Object.keys(updatedPlayers).forEach((player) => {
-      updatedPlayers[player as keyof PlayersState].cards = [
-        deck.pop()!,
-        deck.pop()!,
-      ];
-    });
+    // Reset the coins for each player and deal 2 cards to each player
+    const updatedPlayers: PlayersState = {
+      player1: { cards: [deck.pop()!, deck.pop()!], coins: 2 },
+      player2: { cards: [deck.pop()!, deck.pop()!], coins: 2 },
+      user: { cards: [deck.pop()!, deck.pop()!], coins: 2 },
+    };
 
     // Determine the starting player after dealing the cards
     const startingPlayer: keyof PlayersState = `player${
@@ -67,13 +64,12 @@ const App: React.FC = () => {
 
     // Set the game state with the starting player
     setGameState({
-      ...gameState,
       currentPlayer: startingPlayer,
     });
 
     setPlayers(updatedPlayers);
+    setIncomeTaken(false);
   };
-
   const getNextPlayer = (
     currentPlayer: keyof PlayersState
   ): keyof PlayersState => {
@@ -82,13 +78,58 @@ const App: React.FC = () => {
     const nextIndex = (currentIndex + 1) % playerOrder.length; // This will cycle back to 0 after the last player
     return playerOrder[nextIndex];
   };
+  const handleTakeIncome = () => {
+    if (gameState.currentPlayer && !incomeTaken) {
+      // Create a copy of players state
+      const updatedPlayers = { ...players };
+      // Update the coin count for the current player
+      updatedPlayers[gameState.currentPlayer].coins += 1;
 
+      // Update the players state with the new coin count
+      setPlayers(updatedPlayers);
+
+      // Set the incomeTaken to true
+      setIncomeTaken(true);
+    }
+  };
+  const handleForeignAid = () => {
+    if (gameState.currentPlayer && !incomeTaken) {
+      // Create a copy of players state
+      const updatedPlayers = { ...players };
+      // Update the coin count for the current player
+      updatedPlayers[gameState.currentPlayer].coins += 2;
+
+      // Update the players state with the new coin count
+      setPlayers(updatedPlayers);
+
+      // Set the incomeTaken to true
+      setforeignAidTaken(true);
+    }
+  };
+  const handleTax = () => {
+    if (gameState.currentPlayer && !incomeTaken) {
+      // Create a copy of players state
+      const updatedPlayers = { ...players };
+      // Update the coin count for the current player
+      updatedPlayers[gameState.currentPlayer].coins += 3;
+
+      // Update the players state with the new coin count
+      setPlayers(updatedPlayers);
+
+      // Set the incomeTaken to true
+      setTaxTaken(true);
+    }
+  };
   const handleTurnEnd = () => {
     if (gameState.currentPlayer) {
       setGameState({
         ...gameState,
         currentPlayer: getNextPlayer(gameState.currentPlayer),
       });
+      // Reset the incomeTaken as the turn is ending
+      setIncomeTaken(false);
+      setTaxTaken(false);
+      setforeignAidTaken(false);
     }
   };
 
@@ -123,10 +164,18 @@ const App: React.FC = () => {
       </div>
 
       <div className="actions-turn">
-        <button>Take Income</button>
+        <button onClick={handleTakeIncome} disabled={incomeTaken}>
+          Take Income
+        </button>
+        <button onClick={handleForeignAid} disabled={foreignAidTaken}>
+          Foreign Aid
+        </button>
+        <button onClick={handleTax} disabled={taxTaken}>
+          Tax
+        </button>
         <button>Steal</button>
+        <button>Coup</button>
         <button>Exchange</button>
-        <button>Tax</button>
         <button>Assassinate</button>
       </div>
       <div className="actions-challenge">
