@@ -7,6 +7,7 @@ type CardType = "Duke" | "Captain" | "Assassin" | "Contessa" | "Ambassador";
 // Define the shape of each player's state
 interface PlayerState {
   cards: CardType[];
+  coins: number;
 }
 
 // Define the shape of the overall state for all players
@@ -15,15 +16,21 @@ interface PlayersState {
   player2: PlayerState;
   user: PlayerState;
 }
+// Define the shape of the overall game state
+interface GameState {
+  currentPlayer: keyof PlayersState | null;
+}
 
 const App: React.FC = () => {
   // Define the initial state with types
   const [players, setPlayers] = useState<PlayersState>({
-    player1: { cards: [] },
-    player2: { cards: [] },
-    user: { cards: [] },
+    player1: { cards: [], coins: 2 },
+    player2: { cards: [], coins: 2 },
+    user: { cards: [], coins: 2 },
   });
-
+  const [gameState, setGameState] = useState<GameState>({
+    currentPlayer: null,
+  });
   const shuffleAndDealCards = (): void => {
     const cardTypes: CardType[] = [
       "Duke",
@@ -53,7 +60,36 @@ const App: React.FC = () => {
       ];
     });
 
+    // Determine the starting player after dealing the cards
+    const startingPlayer: keyof PlayersState = `player${
+      Math.floor(Math.random() * 2) + 1
+    }` as keyof PlayersState;
+
+    // Set the game state with the starting player
+    setGameState({
+      ...gameState,
+      currentPlayer: startingPlayer,
+    });
+
     setPlayers(updatedPlayers);
+  };
+
+  const getNextPlayer = (
+    currentPlayer: keyof PlayersState
+  ): keyof PlayersState => {
+    const playerOrder: (keyof PlayersState)[] = ["player1", "player2", "user"];
+    const currentIndex = playerOrder.indexOf(currentPlayer);
+    const nextIndex = (currentIndex + 1) % playerOrder.length; // This will cycle back to 0 after the last player
+    return playerOrder[nextIndex];
+  };
+
+  const handleTurnEnd = () => {
+    if (gameState.currentPlayer) {
+      setGameState({
+        ...gameState,
+        currentPlayer: getNextPlayer(gameState.currentPlayer),
+      });
+    }
   };
 
   return (
@@ -72,17 +108,34 @@ const App: React.FC = () => {
                 </div>
               ))}
             </div>
+            <div className="coins">Coins: {data.coins}</div>
+            <div className="current-player">
+              Current Player:{" "}
+              {gameState.currentPlayer === "user"
+                ? "User"
+                : gameState.currentPlayer}
+            </div>
           </div>
         ))}
       </div>
-      <div className="actions">
+      <div className="actions-start">
         <button onClick={shuffleAndDealCards}>Start/Shuffle</button>
+      </div>
+
+      <div className="actions-turn">
         <button>Take Income</button>
         <button>Steal</button>
         <button>Exchange</button>
         <button>Tax</button>
         <button>Assassinate</button>
+      </div>
+      <div className="actions-challenge">
         <button>Challenge</button>
+        <button>Accept</button>
+      </div>
+
+      <div className="actions-end">
+        <button onClick={handleTurnEnd}>End Turn</button>
       </div>
     </div>
   );
