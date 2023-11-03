@@ -29,6 +29,8 @@ const App: React.FC = () => {
   const [incomeTaken, setIncomeTaken] = useState<boolean>(false);
   const [foreignAidTaken, setforeignAidTaken] = useState<boolean>(false);
   const [taxTaken, setTaxTaken] = useState<boolean>(false);
+  const [assassinate, setAssassinate] = useState<boolean>(false);
+  const [coup, setCoup] = useState<boolean>(false);
 
   const shuffleAndDealCards = (): void => {
     const cardTypes: CardType[] = [
@@ -130,9 +132,86 @@ const App: React.FC = () => {
       setIncomeTaken(false);
       setTaxTaken(false);
       setforeignAidTaken(false);
+      setAssassinate(false);
+      setCoup(false);
     }
   };
+  const handleAssassinate = () => {
+    if (
+      gameState.currentPlayer &&
+      players[gameState.currentPlayer].coins >= 3
+    ) {
+      // Get the list of potential targets by excluding the current player
+      const potentialTargets = Object.keys(players).filter(
+        (player) => player !== gameState.currentPlayer
+      );
 
+      const targetPlayerKey = prompt(
+        `Who do you want to assassinate? (${potentialTargets.join(", ")})`
+      );
+
+      // Check if the selected target is a valid player and is not the current player
+      if (targetPlayerKey && potentialTargets.includes(targetPlayerKey)) {
+        const updatedPlayers = { ...players };
+
+        // Cast targetPlayerKey to keyof PlayersState to satisfy TypeScript
+        const targetKey = targetPlayerKey as keyof PlayersState;
+
+        // Deduct 3 coins from the current player
+        updatedPlayers[gameState.currentPlayer].coins -= 3;
+
+        // Remove a card from the target player
+        if (updatedPlayers[targetKey].cards.length > 0) {
+          updatedPlayers[targetKey].cards.pop();
+        }
+
+        setPlayers(updatedPlayers);
+      } else {
+        alert("Invalid target.");
+      }
+    } else {
+      alert("You cannot assassinate because you do not have enough coins.");
+    }
+    setAssassinate(true);
+  };
+  const handleCoup = () => {
+    if (
+      gameState.currentPlayer &&
+      players[gameState.currentPlayer].coins >= 3
+    ) {
+      // Get the list of potential targets by excluding the current player
+      const potentialTargets = Object.keys(players).filter(
+        (player) => player !== gameState.currentPlayer
+      );
+
+      const targetPlayerKey = prompt(
+        `Who do you want to coup? (${potentialTargets.join(", ")})`
+      );
+
+      // Check if the selected target is a valid player and is not the current player
+      if (targetPlayerKey && potentialTargets.includes(targetPlayerKey)) {
+        const updatedPlayers = { ...players };
+
+        // Cast targetPlayerKey to keyof PlayersState to satisfy TypeScript
+        const targetKey = targetPlayerKey as keyof PlayersState;
+
+        // Deduct 7 coins from the current player
+        updatedPlayers[gameState.currentPlayer].coins -= 7;
+
+        // Remove a card from the target player
+        if (updatedPlayers[targetKey].cards.length > 0) {
+          updatedPlayers[targetKey].cards.pop();
+        }
+
+        setPlayers(updatedPlayers);
+      } else {
+        alert("Invalid target.");
+      }
+    } else {
+      alert("You cannot coup because you don't have enough coins.");
+    }
+    setCoup(true);
+  };
   return (
     <div className="App">
       <header>
@@ -174,9 +253,13 @@ const App: React.FC = () => {
           Tax
         </button>
         <button>Steal</button>
-        <button>Coup</button>
+        <button onClick={handleCoup} disabled={coup}>
+          Coup
+        </button>
         <button>Exchange</button>
-        <button>Assassinate</button>
+        <button onClick={handleAssassinate} disabled={assassinate}>
+          Assassinate
+        </button>
       </div>
       <div className="actions-challenge">
         <button>Challenge</button>
