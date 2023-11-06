@@ -16,6 +16,7 @@ interface PlayersState {
 interface GameState {
   currentPlayer: keyof PlayersState | null;
 }
+const challengeWindowTime = 10000; // 5 seconds for challenge window
 
 const App: React.FC = () => {
   const [players, setPlayers] = useState<PlayersState>({
@@ -31,6 +32,15 @@ const App: React.FC = () => {
   const [taxTaken, setTaxTaken] = useState<boolean>(false);
   const [assassinate, setAssassinate] = useState<boolean>(false);
   const [coup, setCoup] = useState<boolean>(false);
+  const [openChallengeWindow, setOpenChallengeWindow] =
+    useState<boolean>(false);
+  const [isChallenged, setIsChallenged] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [proposedAction, setProposedAction] = useState<(() => void) | null>(
+    null
+  );
+  const [challengeTimeout, setChallengeTimeout] =
+    useState<NodeJS.Timeout | null>(null);
 
   const shuffleAndDealCards = (): void => {
     const cardTypes: CardType[] = [
@@ -71,6 +81,7 @@ const App: React.FC = () => {
 
     setPlayers(updatedPlayers);
     setIncomeTaken(false);
+    console.log("Shuffled and dealt cards.");
   };
   const getNextPlayer = (
     currentPlayer: keyof PlayersState
@@ -92,6 +103,7 @@ const App: React.FC = () => {
 
       // Set the incomeTaken to true
       setIncomeTaken(true);
+      console.log(gameState.currentPlayer + " take Income");
     }
   };
   const handleForeignAid = () => {
@@ -106,34 +118,40 @@ const App: React.FC = () => {
 
       // Set the incomeTaken to true
       setforeignAidTaken(true);
+      console.log(gameState.currentPlayer + " take foreignAid");
     }
   };
   const handleTax = () => {
     if (gameState.currentPlayer && !incomeTaken) {
-      // Create a copy of players state
-      const updatedPlayers = { ...players };
-      // Update the coin count for the current player
-      updatedPlayers[gameState.currentPlayer].coins += 3;
-
-      // Update the players state with the new coin count
-      setPlayers(updatedPlayers);
-
-      // Set the incomeTaken to true
-      setTaxTaken(true);
+      // This is the action that will be committed if not challenged
+      if (gameState.currentPlayer) {
+        const updatedPlayers = { ...players };
+        updatedPlayers[gameState.currentPlayer].coins += 3;
+        setPlayers(updatedPlayers);
+        console.log(gameState.currentPlayer + " takes Tax");
+        setTaxTaken(true);
+      }
     }
   };
+
   const handleTurnEnd = () => {
-    if (gameState.currentPlayer) {
-      setGameState({
-        ...gameState,
-        currentPlayer: getNextPlayer(gameState.currentPlayer),
-      });
-      // Reset the incomeTaken as the turn is ending
-      setIncomeTaken(false);
-      setTaxTaken(false);
-      setforeignAidTaken(false);
-      setAssassinate(false);
-      setCoup(false);
+    if (!isChallenged) {
+      if (gameState.currentPlayer) {
+        setGameState({
+          ...gameState,
+          currentPlayer: getNextPlayer(gameState.currentPlayer),
+        });
+        // Reset the incomeTaken as the turn is ending
+        setIncomeTaken(false);
+        setTaxTaken(false);
+        setforeignAidTaken(false);
+        setAssassinate(false);
+        setCoup(false);
+        console.log("next turn");
+      }
+    } else {
+      // Implement what happens when a challenge occurs
+      // For example, handle the resolution of the challenge
     }
   };
   const handleAssassinate = () => {
@@ -159,6 +177,9 @@ const App: React.FC = () => {
 
         // Deduct 3 coins from the current player
         updatedPlayers[gameState.currentPlayer].coins -= 3;
+        console.log(
+          `${gameState.currentPlayer} is attempting to assassinate ${targetKey}`
+        );
 
         // Remove a card from the target player
         if (updatedPlayers[targetKey].cards.length > 0) {
@@ -168,6 +189,7 @@ const App: React.FC = () => {
         setPlayers(updatedPlayers);
       } else {
         alert("Invalid target.");
+        return;
       }
     } else {
       alert("You cannot assassinate because you do not have enough coins.");
@@ -197,7 +219,7 @@ const App: React.FC = () => {
 
         // Deduct 7 coins from the current player
         updatedPlayers[gameState.currentPlayer].coins -= 7;
-
+        console.log(`${gameState.currentPlayer} is couing ${targetKey}`);
         // Remove a card from the target player
         if (updatedPlayers[targetKey].cards.length > 0) {
           updatedPlayers[targetKey].cards.pop();
@@ -212,6 +234,73 @@ const App: React.FC = () => {
     }
     setCoup(true);
   };
+  // AI action logic
+  const aiTakeAction = () => {
+    if (gameState.currentPlayer && gameState.currentPlayer !== "user") {
+      // Get the AI's current state
+      const aiState = players[gameState.currentPlayer];
+
+      // Decide what action to take based on the AI's state
+      if (aiState.coins >= 7) {
+        // If the AI has enough coins for a coup, perform a coup
+        handleCoup();
+      } else if (aiState.coins >= 3 && Math.random() < 0.5) {
+        // With 3 or more coins, there's a 50% chance to attempt an assassination
+
+        handleAssassinate();
+      } else if (aiState.coins < 3 && Math.random() < 0.7) {
+        // With fewer than 3 coins, there's a 70% chance to take foreign aid
+        handleForeignAid();
+      } else {
+        // Otherwise, just take income
+        handleTakeIncome();
+      }
+      // offer challenge
+      offerChallenge();
+    }
+  };
+  const offerChallenge = () => {
+    setOpenChallengeWindow(true);
+    const timeoutId = setTimeout(() => {
+      if (!isChallenged) {
+        // If no challenge is made, proceed with the action
+        if (proposedAction) proposedAction();
+        handleTurnEnd();
+      }
+      resetTurnState();
+    }, challengeWindowTime);
+    setChallengeTimeout(timeoutId);
+  };
+  const handleAccept = () => {
+    setIsChallenged(false);
+    console.log("move is accepted");
+    setOpenChallengeWindow(false);
+    if (challengeTimeout) clearTimeout(challengeTimeout);
+    if (proposedAction) proposedAction();
+    handleTurnEnd(); // Move to the next turn only after action is accepted
+  };
+
+  const handleChallenge = () => {
+    setIsChallenged(true);
+    console.log("move is Challenged");
+    if (challengeTimeout) clearTimeout(challengeTimeout);
+    // Resolve challenge here, then possibly call handleTurnEnd after resolution
+  };
+  const resetTurnState = () => {
+    setProposedAction(null);
+    setOpenChallengeWindow(false);
+    setIsChallenged(false);
+    setChallengeTimeout(null);
+    // Proceed to next player's turn...
+  };
+  // Effect hook to trigger AI actions when it's AI's turn
+  useEffect(() => {
+    if (gameState.currentPlayer && gameState.currentPlayer !== "user") {
+      const aiActionDelay = setTimeout(aiTakeAction, 1000); // AI will "think" for 1 second
+      return () => clearTimeout(aiActionDelay);
+    }
+  }, [gameState.currentPlayer]);
+
   return (
     <div className="App">
       <header>
@@ -243,27 +332,26 @@ const App: React.FC = () => {
       </div>
 
       <div className="actions-turn">
-        <button onClick={handleTakeIncome} disabled={incomeTaken}>
+        <button onClick={handleTakeIncome} /*disabled={incomeTaken}*/>
           Take Income
         </button>
-        <button onClick={handleForeignAid} disabled={foreignAidTaken}>
+        <button onClick={handleForeignAid} /*disabled={foreignAidTaken}*/>
           Foreign Aid
         </button>
-        <button onClick={handleTax} disabled={taxTaken}>
-          Tax
-        </button>
+        <button onClick={handleTax} /*disabled={taxTaken}*/>Tax</button>
         <button>Steal</button>
-        <button onClick={handleCoup} disabled={coup}>
-          Coup
-        </button>
+        <button onClick={handleCoup} /*disabled={coup}*/>Coup</button>
         <button>Exchange</button>
-        <button onClick={handleAssassinate} disabled={assassinate}>
+        <button onClick={handleAssassinate} /*disabled={assassinate}*/>
           Assassinate
         </button>
       </div>
       <div className="actions-challenge">
-        <button>Challenge</button>
-        <button>Accept</button>
+        {openChallengeWindow && (
+          <button onClick={handleChallenge}>Challenge</button>
+        )}
+        <button>Block</button>
+        <button onClick={handleAccept}>Accept</button>
       </div>
 
       <div className="actions-end">
