@@ -96,7 +96,7 @@ const App = inject(
         gameStore.gameState.currentPlayer !== "user"
       ) {
         const aiActionDelay = setTimeout(() => {
-          aiStore?.aiTakeAction(); // Call aiTakeAction from AIStore
+          aiStore?.AITurn(); // Call aiTakeAction from AIStore
         }, 1000); // AI will "think" for 1 second
 
         return () => clearTimeout(aiActionDelay);

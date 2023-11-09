@@ -9,7 +9,7 @@ class AIStore {
     this.gameStore = gameStore;
   }
 
-  aiTakeAction() {
+  AITurn() {
     const currentPlayerKey = this.gameStore.gameState.currentPlayer;
     if (!currentPlayerKey || currentPlayerKey === "user") {
       console.log("It is not AI's turn.");
