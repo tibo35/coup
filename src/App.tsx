@@ -1,34 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import "./App.css";
 import { observer, inject } from "mobx-react";
 import { GameStore } from "./Store/GameStore";
+import AIStore from "./Store/AIStore";
+import { CardType, Player, PlayersState } from "./Store/GameStore";
 
-type CardType = "Duke" | "Captain" | "Assassin" | "Contessa" | "Ambassador";
-
-interface PlayerState {
-  cards: CardType[];
-  coins: number;
-}
 interface AppProps {
-  gameStore?: GameStore; // Make it optional because inject can provide it
-}
-interface PlayersState {
-  player1: PlayerState;
-  player2: PlayerState;
-  user: PlayerState;
+  gameStore?: GameStore;
+  aiStore?: AIStore;
 }
 
-const App = inject("gameStore")(
-  observer(({ gameStore }: AppProps) => {
-    const [openChallengeWindow, setOpenChallengeWindow] =
-      useState<boolean>(false);
-    const [isChallenged, setIsChallenged] = useState(false);
-
+const App = inject(
+  "gameStore",
+  "aiStore"
+)(
+  observer(({ gameStore, aiStore }: AppProps) => {
     // Use effect hook to manage side-effects and lifecycle events
     useEffect(() => {}, [gameStore]); // Now we depend on gameStore to react to changes
 
     const handleShuffleAndDeal = () => {
-      gameStore?.shuffleAndDealCards(); // The `?.` is optional chaining
+      gameStore?.shuffleAndDealCards();
     };
 
     const handleTakeIncome = () => {
@@ -47,14 +38,6 @@ const App = inject("gameStore")(
       }
     };
 
-    const handleTurnEnd = () => {
-      if (!isChallenged) {
-        gameStore?.getNextPlayer(); // Directly call the method on the store
-        // The rest of your logic for handling end of turn...
-      } else {
-        // Handle challenge...
-      }
-    };
     const handleAssassinate = () => {
       console.log("Assassinate button clicked");
 
@@ -113,12 +96,12 @@ const App = inject("gameStore")(
         gameStore.gameState.currentPlayer !== "user"
       ) {
         const aiActionDelay = setTimeout(() => {
-          gameStore.aiTakeAction(); // Directly call the AI action method on the store
+          aiStore?.aiTakeAction(); // Call aiTakeAction from AIStore
         }, 1000); // AI will "think" for 1 second
 
         return () => clearTimeout(aiActionDelay);
       }
-    }, [gameStore?.gameState.currentPlayer]);
+    }, [gameStore?.gameState.currentPlayer, aiStore]);
 
     return (
       <div className="App">
@@ -153,29 +136,23 @@ const App = inject("gameStore")(
         </div>
 
         <div className="actions-turn">
-          <button onClick={handleTakeIncome} /*disabled={incomeTaken}*/>
-            Take Income
-          </button>
-          <button onClick={handleForeignAid} /*disabled={foreignAidTaken}*/>
-            Foreign Aid
-          </button>
-          <button onClick={handleTax} /*disabled={taxTaken}*/>Tax</button>
+          <button onClick={handleTakeIncome}>Take Income</button>
+          <button onClick={handleForeignAid}>Foreign Aid</button>
+          <button onClick={handleTax}>Tax</button>
           <button>Steal</button>
-          <button onClick={handleCoup} /*disabled={coup}*/>Coup</button>
+          <button onClick={handleCoup}>Coup</button>
           <button>Exchange</button>
-          <button onClick={handleAssassinate} /*disabled={assassinate}*/>
-            Assassinate
-          </button>
+          <button onClick={handleAssassinate}>Assassinate</button>
         </div>
-        <div className="actions-challenge">
-          {openChallengeWindow && <button>Challenge</button>}
-          <button>Block</button>
-          <button>Accept</button>
-        </div>
-
-        <div className="actions-end">
-          <button onClick={handleTurnEnd}>End Turn</button>
-        </div>
+        {gameStore?.challengeWindowOpen && (
+          <div className="actions-challenge">
+            <button onClick={() => gameStore.acceptChallenge()}>Accept</button>
+            <button onClick={() => gameStore.blockAction()}>Block</button>
+            <button onClick={() => gameStore.challengeAction()}>
+              Challenge
+            </button>
+          </div>
+        )}
       </div>
     );
   })

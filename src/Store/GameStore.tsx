@@ -1,5 +1,6 @@
 import { makeAutoObservable } from "mobx";
 import { action, observable } from "mobx";
+import { type } from "os";
 
 export type Player = {
   cards: string[];
@@ -11,6 +12,12 @@ export interface PlayersState {
   player2: Player;
   user: Player;
 }
+export type CardType =
+  | "Duke"
+  | "Captain"
+  | "Assassin"
+  | "Contessa"
+  | "Ambassador";
 
 export type GameState = {
   currentPlayer: keyof PlayersState | null;
@@ -27,14 +34,50 @@ export class GameStore {
     currentPlayer: "user",
   };
 
-  // Additional properties
-  // ...
+  challengeWindowOpen = false;
 
   constructor() {
     makeAutoObservable(this);
   }
+  @action
+  openChallengeWindow() {
+    this.challengeWindowOpen = true;
+  }
 
-  shuffleAndDealCards = () => {
+  @action
+  closeChallengeWindow() {
+    this.challengeWindowOpen = false;
+  }
+
+  @action
+  acceptChallenge() {
+    // Implement the logic to accept the challenge
+    this.closeChallengeWindow();
+    // Proceed with the action as no one challenged
+    this.setNextPlayer(); // Now we explicitly call setNextPlayer only after accepting the challenge
+  }
+
+  @action
+  setNextPlayer() {
+    this.gameState.currentPlayer = this.getNextPlayer();
+  }
+
+  @action
+  blockAction() {
+    // Implement the logic to block the action
+    this.closeChallengeWindow();
+    // Depending on your rules, you may not move to the next player if the action is blocked
+  }
+
+  @action
+  challengeAction() {
+    // Implement the logic for a challenge
+    this.closeChallengeWindow();
+    // Handle the challenge resolution before moving on to the next player
+  }
+
+  @action
+  shuffleAndDealCards() {
     const cardTypes = ["Duke", "Captain", "Assassin", "Contessa", "Ambassador"];
     let deck: string[] = [];
 
@@ -65,35 +108,43 @@ export class GameStore {
     this.gameState.currentPlayer = startingPlayer;
 
     console.log("Shuffled and dealt cards.");
-  };
-  getTakeIncome = (playerKey: keyof PlayersState) => {
+  }
+
+  @action
+  getTakeIncome(playerKey: keyof PlayersState) {
     if (this.gameState.currentPlayer === playerKey) {
       const player = this.players[playerKey];
       player.coins += 1; // Increment the coins by 1 for income
-      this.gameState.currentPlayer = this.getNextPlayer(); // Set the next player
+      this.openChallengeWindow();
       console.log("take income");
     }
-  };
-  getForeignAid = (playerKey: keyof PlayersState) => {
+  }
+
+  @action
+  getForeignAid(playerKey: keyof PlayersState) {
     if (this.gameState.currentPlayer === playerKey) {
       const player = this.players[playerKey];
       player.coins += 2; // Increment the coins by 2 for foreign aid
-      this.gameState.currentPlayer = this.getNextPlayer(); // Set the next player
       console.log("take foreign aid");
+      this.gameState.currentPlayer = this.getNextPlayer(); // Set the next player
     }
-  };
-  getTax = (playerKey: keyof PlayersState) => {
+  }
+
+  @action
+  getTax(playerKey: keyof PlayersState) {
     if (this.gameState.currentPlayer === playerKey) {
       const player = this.players[playerKey];
       player.coins += 3; // Increment the coins by 3 for tax
-      this.gameState.currentPlayer = this.getNextPlayer(); // Set the next player
+      this.openChallengeWindow();
       console.log("take tax");
     }
-  };
-  getAssassinate = (
+  }
+
+  @action
+  getAssassinate(
     assassinPlayerKey: keyof PlayersState,
     targetPlayerKey: keyof PlayersState
-  ) => {
+  ) {
     const assassinPlayer = this.players[assassinPlayerKey];
     const targetPlayer = this.players[targetPlayerKey];
 
@@ -110,8 +161,10 @@ export class GameStore {
     } else {
       alert("You cannot assassinate because you do not have enough coins.");
     }
-  };
+    this.openChallengeWindow();
+  }
 
+  @action
   makeCoup(targetPlayerKey: keyof PlayersState) {
     const currentPlayerKey = this.gameState.currentPlayer;
     if (!currentPlayerKey) {
@@ -138,51 +191,16 @@ export class GameStore {
       `${currentPlayerKey} has successfully couped ${targetPlayerKey}`
     );
 
-    // Move to the next player or handle additional logic here
     this.gameState.currentPlayer = this.getNextPlayer();
   }
 
-  getNextPlayer = (): keyof PlayersState => {
+  @action
+  getNextPlayer(): keyof PlayersState {
     const playerOrder: (keyof PlayersState)[] = ["player1", "player2", "user"];
     const currentIndex = playerOrder.indexOf(this.gameState.currentPlayer!);
     const nextIndex = (currentIndex + 1) % playerOrder.length; // Cycle back to 0 after the last player
-    console.log("get next player");
+    console.log("Next player:", playerOrder[nextIndex]);
     return playerOrder[nextIndex];
-  };
-
-  aiTakeAction() {
-    const currentPlayerKey = this.gameState.currentPlayer;
-    if (!currentPlayerKey || currentPlayerKey === "user") {
-      console.log("It is not AI's turn.");
-      return;
-    }
-
-    const currentPlayer = this.players[currentPlayerKey];
-
-    // AI decision-making logic
-    if (currentPlayer.coins >= 7) {
-      // If the AI has enough coins for a coup, perform a coup
-      this.makeCoup(currentPlayerKey);
-    } else if (currentPlayer.coins >= 3 && Math.random() < 0.5) {
-      // With 3 or more coins, there's a 50% chance to attempt an assassination
-      // For simplicity, we'll target a random player (not "user" and not self)
-      const potentialTargets = Object.keys(this.players).filter(
-        (key) => key !== "user" && key !== currentPlayerKey
-      ) as Array<keyof PlayersState>; // Type assertion here
-      const target =
-        potentialTargets[Math.floor(Math.random() * potentialTargets.length)];
-      if (target) {
-        this.getAssassinate(currentPlayerKey, target);
-      }
-    } else if (currentPlayer.coins < 3 && Math.random() < 0.7) {
-      // With fewer than 3 coins, there's a 70% chance to take foreign aid
-      this.getForeignAid(currentPlayerKey);
-    } else {
-      // Otherwise, just take income
-      this.getTakeIncome(currentPlayerKey);
-    }
-
-    // After AI takes action, you may decide to end the turn, offer challenges, etc.
   }
 }
 
