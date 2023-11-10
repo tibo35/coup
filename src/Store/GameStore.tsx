@@ -22,6 +22,12 @@ export type CardType =
 export type GameState = {
   currentPlayer: keyof PlayersState | null;
 };
+function shuffleArray(array: any[]) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
 
 export class GameStore {
   players: PlayersState = {
@@ -39,6 +45,7 @@ export class GameStore {
   constructor() {
     makeAutoObservable(this);
   }
+
   @action
   openChallengeWindow() {
     this.challengeWindowOpen = true;
@@ -88,12 +95,12 @@ export class GameStore {
       }
     });
 
-    // Shuffle the deck
-    deck = deck.sort(() => Math.random() - 0.5);
+    // Shuffle the deck using Fisher-Yates shuffle
+    shuffleArray(deck);
 
     // Deal two cards to each player
     const updatedPlayers: PlayersState = {
-      player1: { cards: [deck.pop()!, deck.pop()!], coins: 2 }, // The '!' is a non-null assertion operator, assuming that deck will have enough cards.
+      player1: { cards: [deck.pop()!, deck.pop()!], coins: 2 },
       player2: { cards: [deck.pop()!, deck.pop()!], coins: 2 },
       user: { cards: [deck.pop()!, deck.pop()!], coins: 2 },
     };
