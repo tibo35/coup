@@ -180,7 +180,7 @@ export class GameStore {
       return;
     }
 
-    if (targetPlayerKey === currentPlayerKey) {
+    /*if (targetPlayerKey === currentPlayerKey) {
       // Select a different target if the chosen target is the current player
       const potentialTargets = Object.keys(this.players)
         .filter((key) => key !== currentPlayerKey)
@@ -194,7 +194,7 @@ export class GameStore {
       // Randomly select a new target from potential targets
       targetPlayerKey =
         potentialTargets[Math.floor(Math.random() * potentialTargets.length)];
-    }
+    }*/
 
     const currentPlayer = this.players[currentPlayerKey];
     const targetPlayer = this.players[targetPlayerKey];

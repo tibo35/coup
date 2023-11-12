@@ -43,7 +43,32 @@ class AIStore {
   selectTargetForCoup(
     currentPlayerKey: keyof PlayersState
   ): keyof PlayersState {
-    return "player1"; // Placeholder logic
+    // Get a list of potential targets, excluding the current player
+    const potentialTargets = Object.keys(this.gameStore.players)
+      .filter((key) => key !== currentPlayerKey)
+      .map((key) => key as keyof PlayersState);
+
+    if (potentialTargets.length === 0) {
+      console.error("No valid targets for coup.");
+      return currentPlayerKey; // Fallback
+    }
+
+    // Sort the potential targets based on the number of cards and then by coins
+    potentialTargets.sort((a, b) => {
+      const playerA = this.gameStore.players[a];
+      const playerB = this.gameStore.players[b];
+
+      if (playerA.cards.length !== playerB.cards.length) {
+        // Prioritize the player with more cards
+        return playerB.cards.length - playerA.cards.length;
+      } else {
+        // If the number of cards is the same, prioritize the player with more coins
+        return playerB.coins - playerA.coins;
+      }
+    });
+
+    // Return the first target in the sorted list
+    return potentialTargets[0];
   }
 
   shouldAssassinate(currentPlayerKey: keyof PlayersState): boolean {
