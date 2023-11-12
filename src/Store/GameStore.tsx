@@ -174,9 +174,26 @@ export class GameStore {
   @action
   makeCoup(targetPlayerKey: keyof PlayersState) {
     const currentPlayerKey = this.gameState.currentPlayer;
+
     if (!currentPlayerKey) {
       console.log("No current player to perform a coup.");
       return;
+    }
+
+    if (targetPlayerKey === currentPlayerKey) {
+      // Select a different target if the chosen target is the current player
+      const potentialTargets = Object.keys(this.players)
+        .filter((key) => key !== currentPlayerKey)
+        .map((key) => key as keyof PlayersState);
+
+      if (potentialTargets.length === 0) {
+        console.log("No valid targets for coup.");
+        return;
+      }
+
+      // Randomly select a new target from potential targets
+      targetPlayerKey =
+        potentialTargets[Math.floor(Math.random() * potentialTargets.length)];
     }
 
     const currentPlayer = this.players[currentPlayerKey];
@@ -198,7 +215,8 @@ export class GameStore {
       `${currentPlayerKey} has successfully couped ${targetPlayerKey}`
     );
 
-    this.gameState.currentPlayer = this.getNextPlayer();
+    // Move to the next player
+    this.setNextPlayer();
   }
 
   @action
