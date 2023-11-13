@@ -1,5 +1,11 @@
 import { makeAutoObservable } from "mobx";
-import { GameStore, PlayersState, Player, CardType } from "./GameStore";
+import {
+  GameStore,
+  PlayersState,
+  Player,
+  CardType,
+  ActionHistory,
+} from "./GameStore";
 
 class AIStore {
   gameStore: GameStore;
@@ -19,11 +25,11 @@ class AIStore {
 
     // AI decision-making logic
     if (this.shouldCoup(currentPlayerKey)) {
-      this.gameStore.makeCoup(this.selectTargetForCoup(currentPlayerKey));
+      this.gameStore.makeCoup(this.selectTarget(currentPlayerKey));
     } else if (this.shouldAssassinate(currentPlayerKey)) {
       this.gameStore.getAssassinate(
         currentPlayerKey,
-        this.selectTargetForAssassination(currentPlayerKey)
+        this.selectTarget(currentPlayerKey)
       );
     } else if (this.shouldCollectForeignAid(currentPlayerKey)) {
       this.gameStore.getForeignAid(currentPlayerKey);
@@ -32,17 +38,7 @@ class AIStore {
     }
   }
 
-  shouldCoup(currentPlayerKey: keyof PlayersState): boolean {
-    if (this.gameStore.players[currentPlayerKey].coins >= 7) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  selectTargetForCoup(
-    currentPlayerKey: keyof PlayersState
-  ): keyof PlayersState {
+  selectTarget(currentPlayerKey: keyof PlayersState): keyof PlayersState {
     // Get a list of potential targets, excluding the current player
     const potentialTargets = Object.keys(this.gameStore.players)
       .filter((key) => key !== currentPlayerKey)
@@ -71,26 +67,22 @@ class AIStore {
     return potentialTargets[0];
   }
 
-  shouldAssassinate(currentPlayerKey: keyof PlayersState): boolean {
-    return false; // Placeholder logic
+  shouldCoup(currentPlayerKey: keyof PlayersState): boolean {
+    if (this.gameStore.players[currentPlayerKey].coins >= 7) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
-  selectTargetForAssassination(
-    currentPlayerKey: keyof PlayersState
-  ): keyof PlayersState {
-    return "player2"; // Placeholder logic
+  shouldAssassinate(currentPlayerKey: keyof PlayersState): boolean {
+    return false; // Placeholder logic
   }
 
   shouldCollectForeignAid(currentPlayerKey: keyof PlayersState): boolean {
     const playerCoins = this.gameStore.players[currentPlayerKey].coins;
 
-    // If the AI has enough coins for a coup, it might prefer more aggressive actions over foreign aid.
-    if (this.gameStore.players[currentPlayerKey].coins >= 7) {
-      return false;
-    }
-
-    // If the AI has a few coins and is not at immediate risk of being couped, it might try to collect foreign aid.
-    // However, if there's a high chance of being blocked (e.g., if opponents often claim the Duke), it should reconsider.
+    // if there's a high chance of being blocked it should reconsider.
     const chanceOfBeingBlocked = this.estimateChanceOfBeingBlocked();
 
     // If the chance of being blocked is high, and AI has alternative actions with less risk, avoid foreign aid.
@@ -123,7 +115,44 @@ class AIStore {
   }
 
   estimateChanceOfBeingBlocked(): number {
-    return Math.random(); // Placeholder return
+    const currentPlayerKey = this.gameStore.gameState.currentPlayer;
+    if (!currentPlayerKey) {
+      return 0; // No current player, return 0 chance
+    }
+
+    let blockClaims = {
+      duke: 0,
+      captain: 0,
+      contessa: 0,
+    };
+    let totalPlayers = 0;
+
+    // Iterate through each player except the current AI player
+    Object.values(this.gameStore.players).forEach((player) => {
+      if (player !== this.gameStore.players[currentPlayerKey]) {
+        totalPlayers++;
+        player.actionHistory.forEach((action: ActionHistory) => {
+          if (action.claimedCard) {
+            if (action.claimedCard === "Duke") {
+              blockClaims.duke++;
+            } else if (action.claimedCard === "Captain") {
+              blockClaims.captain++;
+            } else if (action.claimedCard === "Contessa") {
+              blockClaims.contessa++;
+            }
+          }
+        });
+      }
+    });
+
+    // Example calculation for Duke block chance; adapt for Captain and Contessa as needed
+    const dukeBlockChance = blockClaims.duke / totalPlayers;
+
+    // Combine and normalize the block chances based on your game logic
+    // The logic here can be more complex based on the specific action being evaluated
+    const totalBlockChance = dukeBlockChance; // Placeholder, you might want to combine captain and contessa chances here too
+
+    return totalBlockChance;
   }
 
   hasAlternativeIncomeSources(currentPlayerKey: keyof PlayersState): boolean {

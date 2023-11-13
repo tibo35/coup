@@ -2,9 +2,15 @@ import { makeAutoObservable } from "mobx";
 import { action, observable } from "mobx";
 import { type } from "os";
 
+export type ActionHistory = {
+  action: string;
+  claimedCard?: CardType;
+};
+
 export type Player = {
   cards: string[];
   coins: number;
+  actionHistory: ActionHistory[]; // New property to track player actions
 };
 
 export interface PlayersState {
@@ -31,9 +37,9 @@ function shuffleArray(array: any[]) {
 
 export class GameStore {
   players: PlayersState = {
-    player1: { cards: [], coins: 2 },
-    player2: { cards: [], coins: 2 },
-    user: { cards: [], coins: 2 },
+    player1: { cards: [], coins: 2, actionHistory: [] },
+    player2: { cards: [], coins: 2, actionHistory: [] },
+    user: { cards: [], coins: 2, actionHistory: [] },
   };
 
   gameState: GameState = {
@@ -100,9 +106,17 @@ export class GameStore {
 
     // Deal two cards to each player
     const updatedPlayers: PlayersState = {
-      player1: { cards: [deck.pop()!, deck.pop()!], coins: 2 },
-      player2: { cards: [deck.pop()!, deck.pop()!], coins: 2 },
-      user: { cards: [deck.pop()!, deck.pop()!], coins: 2 },
+      player1: {
+        cards: [deck.pop()!, deck.pop()!],
+        coins: 2,
+        actionHistory: [],
+      },
+      player2: {
+        cards: [deck.pop()!, deck.pop()!],
+        coins: 2,
+        actionHistory: [],
+      },
+      user: { cards: [deck.pop()!, deck.pop()!], coins: 2, actionHistory: [] },
     };
 
     // Update the players in the store
@@ -124,6 +138,7 @@ export class GameStore {
       player.coins += 1; // Increment the coins by 1 for income
       this.openChallengeWindow();
       console.log("take income");
+      this.players[playerKey].actionHistory.push({ action: "Take Income" });
     }
   }
 
@@ -134,6 +149,7 @@ export class GameStore {
       player.coins += 2; // Increment the coins by 2 for foreign aid
       console.log("take foreign aid");
       this.gameState.currentPlayer = this.getNextPlayer(); // Set the next player
+      this.players[playerKey].actionHistory.push({ action: "Take ForeignAid" });
     }
   }
 
@@ -144,6 +160,7 @@ export class GameStore {
       player.coins += 3; // Increment the coins by 3 for tax
       this.openChallengeWindow();
       console.log("take tax");
+      this.players[playerKey].actionHistory.push({ action: "Take Tax" });
     }
   }
 
