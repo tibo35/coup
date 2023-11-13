@@ -88,7 +88,33 @@ const App = inject(
         alert("Invalid target selected for coup.");
       }
     };
+    const handleBlockAction = (action: string, isBlockChallenged = false) => {
+      const currentPlayerKey = gameStore?.gameState.currentPlayer;
 
+      if (action === "Block") {
+        if (currentPlayerKey && gameStore.currentActionType) {
+          gameStore.attemptBlock(
+            "user",
+            gameStore.currentActionType,
+            isBlockChallenged
+          );
+        }
+      } else if (action === "Challenge") {
+        if (currentPlayerKey && gameStore.challengedPlayer) {
+          gameStore.initiateChallenge("user", gameStore.challengedPlayer);
+        }
+      } else {
+        gameStore?.closeBlockWindow();
+        gameStore?.setNextPlayer();
+      }
+    };
+
+    useEffect(() => {
+      // React to changes in blockWindowOpen or other relevant state variables
+      if (gameStore?.blockWindowOpen) {
+        // Update UI based on block window state
+      }
+    }, [gameStore?.blockWindowOpen]);
     // AI action logic
     useEffect(() => {
       if (
@@ -144,15 +170,15 @@ const App = inject(
           <button>Exchange</button>
           <button onClick={handleAssassinate}>Assassinate</button>
         </div>
-        {gameStore?.challengeWindowOpen && (
-          <div className="actions-challenge">
-            <button onClick={() => gameStore.acceptChallenge()}>Accept</button>
-            <button onClick={() => gameStore.blockAction()}>Block</button>
-            <button onClick={() => gameStore.challengeAction()}>
-              Challenge
-            </button>
+        {gameStore?.blockWindowOpen && (
+          <div className="actions-block">
+            <button onClick={() => handleBlockAction("Block")}>Block</button>
+            <button onClick={() => handleBlockAction("Pass")}>Pass</button>
           </div>
         )}
+        <button onClick={() => handleBlockAction("Challenge")}>
+          Challenge
+        </button>
       </div>
     );
   })

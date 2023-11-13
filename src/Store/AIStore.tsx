@@ -23,14 +23,17 @@ class AIStore {
       return;
     }
 
-    // AI decision-making logic
     if (this.shouldCoup(currentPlayerKey)) {
       this.gameStore.makeCoup(this.selectTarget(currentPlayerKey));
     } else if (this.shouldAssassinate(currentPlayerKey)) {
+      // If the AI should assassinate, call the getAssassinate method
       this.gameStore.getAssassinate(
         currentPlayerKey,
         this.selectTarget(currentPlayerKey)
       );
+    } else if (this.shouldCollectTax(currentPlayerKey)) {
+      // Call the getTax method if the AI should collect tax
+      this.gameStore.getTax(currentPlayerKey);
     } else if (this.shouldCollectForeignAid(currentPlayerKey)) {
       this.gameStore.getForeignAid(currentPlayerKey);
     } else {
@@ -76,7 +79,11 @@ class AIStore {
   }
 
   shouldAssassinate(currentPlayerKey: keyof PlayersState): boolean {
-    return false; // Placeholder logic
+    const hasAssassin =
+      this.gameStore.players[currentPlayerKey].cards.includes("Assassin");
+    const hasEnoughCoins = this.gameStore.players[currentPlayerKey].coins >= 3;
+
+    return hasAssassin && hasEnoughCoins;
   }
 
   shouldCollectForeignAid(currentPlayerKey: keyof PlayersState): boolean {
@@ -112,6 +119,12 @@ class AIStore {
 
     // If AI is not at risk of a coup from opponents, taking foreign aid can be a reasonable action.
     return true;
+  }
+
+  shouldCollectTax(currentPlayerKey: keyof PlayersState): boolean {
+    const hasDuke =
+      this.gameStore.players[currentPlayerKey].cards.includes("Duke");
+    return hasDuke;
   }
 
   estimateChanceOfBeingBlocked(): number {
@@ -161,6 +174,34 @@ class AIStore {
 
     // Check if the player has cards that can provide income with less risk
     return playerCards.includes("Duke") || playerCards.includes("Captain");
+  }
+
+  blockForeignAid(blockingPlayerKey: keyof PlayersState) {
+    if (this.gameStore.players[blockingPlayerKey].cards.includes("Duke")) {
+      console.log(
+        `${blockingPlayerKey} has blocked foreign aid with the Duke card.`
+      );
+      // Handle the block logic here
+      // You might want to revert the foreign aid action or simply end the turn
+    } else {
+      console.log(
+        `${blockingPlayerKey} cannot block foreign aid without the Duke card.`
+      );
+    }
+  }
+  handleAIChallenge() {
+    console.log("AI is handling a challenge.");
+    if (
+      this.gameStore.isChallengeActive &&
+      this.gameStore.challengedPlayer &&
+      this.gameStore.challenger &&
+      this.gameStore.currentActionType
+    ) {
+      // For now, let AI always accept the challenge
+      this.gameStore.resolveChallenge(); // Call resolveChallenge from GameStore
+    } else {
+      console.log("Missing information for AI challenge.");
+    }
   }
 }
 
