@@ -239,31 +239,15 @@ export class GameStore {
     actionType: string,
     isBlockChallenged: boolean
   ) {
-    if (actionType) {
-      console.log(`${playerKey} blocks ${actionType}`);
-
-      if (isBlockChallenged) {
-        // If the block is challenged
-        if (this.gameState.currentPlayer) {
-          this.initiateChallenge(playerKey, this.gameState.currentPlayer);
-        } else {
-          console.log("Error: No current player to challenge the block.");
-        }
-      } else {
-        // Check if currentPlayer is not null before opening the challenge window
-        if (this.gameState.currentPlayer) {
-          this.openChallengeWindow(
-            this.gameState.currentPlayer,
-            playerKey,
-            actionType
-          );
-        } else {
-          console.log("Error: No current player to open challenge window for.");
-          // Handle the case when there's no current player
-        }
-      }
+    console.log(`${playerKey} attempts to block ${actionType}`);
+    if (this.gameState.currentPlayer) {
+      this.openChallengeWindow(
+        this.gameState.currentPlayer,
+        playerKey,
+        actionType
+      );
     } else {
-      console.log(`${playerKey} cannot block ${actionType}.`);
+      console.log("Error: No current player to open challenge window for.");
     }
   }
 

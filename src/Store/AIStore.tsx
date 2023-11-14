@@ -189,19 +189,34 @@ class AIStore {
       );
     }
   }
-  handleAIChallenge() {
-    console.log("AI is handling a challenge.");
-    if (
-      this.gameStore.isChallengeActive &&
-      this.gameStore.challengedPlayer &&
-      this.gameStore.challenger &&
-      this.gameStore.currentActionType
-    ) {
-      // For now, let AI always accept the challenge
-      this.gameStore.resolveChallenge(); // Call resolveChallenge from GameStore
+  decideOnBlockChallenge(aiPlayerKey: keyof PlayersState, actionType: string) {
+    if (this.gameStore.gameState.currentPlayer) {
+      if (this.shouldChallengeBlock(aiPlayerKey, actionType)) {
+        // AI decides to challenge the block
+        this.gameStore.initiateChallenge(
+          aiPlayerKey,
+          this.gameStore.gameState.currentPlayer
+        );
+      } else {
+        // AI accepts the block and reverts the action without losing a card
+        this.gameStore.revertAction(
+          this.gameStore.gameState.currentPlayer,
+          actionType
+        );
+        this.gameStore.setNextPlayer();
+      }
     } else {
-      console.log("Missing information for AI challenge.");
+      console.error("Error: Current player is null.");
     }
+  }
+
+  shouldChallengeBlock(
+    aiPlayerKey: keyof PlayersState,
+    actionType: string
+  ): boolean {
+    // Implement AI logic to decide whether to challenge
+    // For now, let's assume AI always challenges
+    return true;
   }
 }
 
