@@ -23,20 +23,27 @@ class AIStore {
       return;
     }
 
+    // First, check if AI should make a coup
     if (this.shouldCoup(currentPlayerKey)) {
       this.gameStore.makeCoup(this.selectTarget(currentPlayerKey));
-    } else if (this.shouldAssassinate(currentPlayerKey)) {
-      // If the AI should assassinate, call the getAssassinate method
+    }
+    // Next, check if AI should assassinate
+    else if (this.shouldAssassinate(currentPlayerKey)) {
       this.gameStore.getAssassinate(
         currentPlayerKey,
         this.selectTarget(currentPlayerKey)
       );
-    } else if (this.shouldCollectTax(currentPlayerKey)) {
-      // Call the getTax method if the AI should collect tax
+    }
+    // Check if AI should collect tax (priority if AI has Duke)
+    else if (this.shouldCollectTax(currentPlayerKey)) {
       this.gameStore.getTax(currentPlayerKey);
-    } else if (this.shouldCollectForeignAid(currentPlayerKey)) {
+    }
+    // Then, check if AI should collect foreign aid
+    else if (this.shouldCollectForeignAid(currentPlayerKey)) {
       this.gameStore.getForeignAid(currentPlayerKey);
-    } else {
+    }
+    // Default action if none of the above
+    else {
       this.gameStore.getTakeIncome(currentPlayerKey);
     }
   }
@@ -214,9 +221,18 @@ class AIStore {
     aiPlayerKey: keyof PlayersState,
     actionType: string
   ): boolean {
-    // Implement AI logic to decide whether to challenge
-    // For now, let's assume AI always challenges
-    return true;
+    // Retrieve AI player's cards
+    const aiPlayerCards = this.gameStore.players[aiPlayerKey].cards;
+
+    // Logic to decide whether to challenge based on the AI's cards and the action type
+    switch (actionType) {
+      case "Foreign Aid":
+        // AI should only challenge if it has a Duke
+        return aiPlayerCards.includes("Duke");
+      // Other cases can be added for different action types
+      default:
+        return false; // By default, do not challenge if conditions are not met
+    }
   }
 }
 
