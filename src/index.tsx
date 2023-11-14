@@ -7,9 +7,9 @@ import GameStore from "./Store/GameStore";
 import AIStore from "./Store/AIStore";
 import { Provider } from "mobx-react";
 
-const gameStore = new GameStore();
-const aiStore = new AIStore(gameStore);
-
+const gameStore = new GameStore(); // Create GameStore instance first
+const aiStore = new AIStore(gameStore); // Pass gameStore to AIStore
+gameStore.setAIStore(aiStore);
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
