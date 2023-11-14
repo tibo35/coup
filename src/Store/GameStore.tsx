@@ -6,7 +6,6 @@ export type ActionHistory = {
   action: string;
   claimedCard?: CardType;
 };
-
 export type Player = {
   cards: string[];
   coins: number;
@@ -36,6 +35,11 @@ function shuffleArray(array: any[]) {
 }
 
 export class GameStore {
+  aiStore?: AIStore; // Add aiStore as an optional property
+
+  setAIStore(aiStore: AIStore) {
+    this.aiStore = aiStore;
+  }
   players: PlayersState = {
     player1: { cards: [], coins: 2, actionHistory: [] },
     player2: { cards: [], coins: 2, actionHistory: [] },
@@ -269,7 +273,15 @@ export class GameStore {
   @action
   handleAIChallenge() {
     if (this.challengedPlayer && this.challenger && this.currentActionType) {
-      this.resolveChallenge(); // This will process the challenge as usual
+      // Check if aiStore is set before using it
+      if (this.aiStore) {
+        this.aiStore.decideOnBlockChallenge(
+          this.challengedPlayer,
+          this.currentActionType
+        );
+      } else {
+        console.log("AI Store is not set.");
+      }
     } else {
       console.log("Missing information for AI challenge.");
     }

@@ -210,7 +210,7 @@ class AIStore {
           this.gameStore.gameState.currentPlayer,
           actionType
         );
-        this.gameStore.setNextPlayer();
+        //this.gameStore.setNextPlayer();
       }
     } else {
       console.error("Error: Current player is null.");
