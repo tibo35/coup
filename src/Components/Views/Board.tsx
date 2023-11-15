@@ -4,6 +4,7 @@ import { observer, inject } from "mobx-react";
 import { GameStore } from "../../Store/GameStore";
 import AIStore from "../../Store/AIStore";
 import { CardType, Player, PlayersState } from "../../Store/GameStore";
+import ActionsButtons from "../ActionsButtons";
 
 interface AppProps {
   gameStore?: GameStore;
@@ -17,97 +18,6 @@ const App = inject(
   observer(({ gameStore, aiStore }: AppProps) => {
     // Use effect hook to manage side-effects and lifecycle events
     useEffect(() => {}, [gameStore]); // Now we depend on gameStore to react to changes
-
-    const handleShuffleAndDeal = () => {
-      gameStore?.shuffleAndDealCards();
-    };
-
-    const handleTakeIncome = () => {
-      if (gameStore?.gameState.currentPlayer) {
-        gameStore.getTakeIncome(gameStore.gameState.currentPlayer);
-      }
-    };
-    const handleForeignAid = () => {
-      if (gameStore?.gameState.currentPlayer) {
-        gameStore.getForeignAid(gameStore.gameState.currentPlayer);
-      }
-    };
-    const handleTax = () => {
-      if (gameStore?.gameState.currentPlayer) {
-        gameStore.getTax(gameStore.gameState.currentPlayer);
-      }
-    };
-
-    const handleAssassinate = () => {
-      console.log("Assassinate button clicked");
-
-      if (gameStore) {
-        const currentPlayerKey = gameStore.gameState.currentPlayer; // Directly use currentPlayer from gameStore
-        console.log("Current player is:", currentPlayerKey);
-
-        if (currentPlayerKey) {
-          const targetPlayerKey = prompt(
-            "Who do you want to assassinate? (player1, player2)"
-          );
-
-          if (targetPlayerKey) {
-            console.log("Target player selected:", targetPlayerKey);
-            gameStore.getAssassinate(
-              currentPlayerKey,
-              targetPlayerKey as keyof PlayersState
-            );
-          } else {
-            console.log("Assassination cancelled or invalid target");
-          }
-        } else {
-          console.log("No current player set in gameStore");
-        }
-      } else {
-        console.log("gameStore is not available");
-      }
-    };
-
-    const handleCoup = () => {
-      const currentPlayerKey = gameStore?.gameState.currentPlayer;
-      if (!currentPlayerKey) {
-        alert("It's not currently any player's turn.");
-        return;
-      }
-
-      const potentialTargets = Object.keys(gameStore.players).filter(
-        (playerKey) => playerKey !== currentPlayerKey
-      );
-
-      const targetPlayerKey = prompt(
-        `Who do you want to coup? (${potentialTargets.join(", ")})`
-      );
-
-      if (targetPlayerKey && potentialTargets.includes(targetPlayerKey)) {
-        gameStore.makeCoup(targetPlayerKey as keyof PlayersState);
-      } else {
-        alert("Invalid target selected for coup.");
-      }
-    };
-    const handleBlockAction = (action: string, isBlockChallenged = false) => {
-      const currentPlayerKey = gameStore?.gameState.currentPlayer;
-
-      if (action === "Block") {
-        if (currentPlayerKey && gameStore.currentActionType) {
-          gameStore.attemptBlock(
-            "user",
-            gameStore.currentActionType,
-            isBlockChallenged
-          );
-        }
-      } else if (action === "Challenge") {
-        if (currentPlayerKey && gameStore.challengedPlayer) {
-          gameStore.initiateChallenge("user", gameStore.challengedPlayer);
-        }
-      } else {
-        gameStore?.closeBlockWindow();
-        gameStore?.setNextPlayer();
-      }
-    };
 
     useEffect(() => {
       // React to changes in blockWindowOpen or other relevant state variables
@@ -131,9 +41,6 @@ const App = inject(
 
     return (
       <div className="App">
-        <header>
-          <p>Coup</p>
-        </header>
         <div className="board">
           {Object.entries(gameStore?.players ?? {}).map(
             ([player, data], index) => (
@@ -157,30 +64,7 @@ const App = inject(
             )
           )}
         </div>
-
-        <div className="actions-container">
-          <div className="actions-start">
-            <button onClick={handleShuffleAndDeal}>Start/Shuffle</button>
-          </div>
-          <div className="actions-turn">
-            <button onClick={handleTakeIncome}>Take Income</button>
-            <button onClick={handleForeignAid}>Foreign Aid</button>
-            <button onClick={handleTax}>Tax</button>
-            <button>Steal</button>
-            <button onClick={handleCoup}>Coup</button>
-            <button>Exchange</button>
-            <button onClick={handleAssassinate}>Assassinate</button>
-          </div>
-          {gameStore?.blockWindowOpen && (
-            <div className="actions-block">
-              <button onClick={() => handleBlockAction("Block")}>Block</button>
-              <button onClick={() => handleBlockAction("Pass")}>Pass</button>
-            </div>
-          )}
-          <button onClick={() => handleBlockAction("Challenge")}>
-            Challenge
-          </button>
-        </div>
+        <ActionsButtons gameStore={gameStore} />
       </div>
     );
   })
