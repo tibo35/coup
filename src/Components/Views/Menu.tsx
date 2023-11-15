@@ -1,20 +1,20 @@
 import React from "react";
 import { Link } from "react-router-dom";
-
+import "./Menu.css";
 const Menu = () => {
   return (
-    <div>
-      <h1>Menu</h1>
+    <div className="menu-container">
+      <h1>COUP</h1>
       <nav>
         <ul>
-          <li>
+          <li className="custom-btn btn-3">
             <Link to="/play">Play</Link>
           </li>
-          <li>
-            <Link to="/settings">Settings</Link>
-          </li>
-          <li>
+          <li className="custom-btn btn-3">
             <Link to="/rules">Rules</Link>
+          </li>
+          <li className="custom-btn btn-3">
+            <Link to="/settings">Settings</Link>
           </li>
         </ul>
       </nav>

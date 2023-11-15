@@ -20,7 +20,7 @@
 }
 
 .ai-deck .card img {
-  width: 95px; /* adjust size  */
+  width: 80px; /* adjust size  */
   height: auto;
   object-fit: contain;
 }
