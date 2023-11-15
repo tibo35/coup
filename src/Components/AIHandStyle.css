@@ -1,10 +1,39 @@
 .board {
   display: flex;
-  justify-content: space-between; /* This spreads out the child elements */
+  justify-content: space-between;
 }
 
 .ai-deck {
-  border: 1px solid red;
-  flex: 1; /* This makes each deck take equal space */
-  margin: 10px; /* Adjust as needed */
+  flex: 1;
+  margin: 20px;
+}
+
+.ai-deck .cards {
+  display: flex;
+  align-items: center;
+}
+
+.ai-deck .card {
+  margin-right: -20px;
+  position: relative;
+  z-index: 1;
+}
+
+.ai-deck .card img {
+  width: 95px; /* adjust size  */
+  height: auto;
+  object-fit: contain;
+}
+
+.ai-deck .card:nth-child(1) {
+  z-index: 1;
+}
+
+.ai-deck .card:nth-child(2) {
+  margin-top: -20px; /* Raise second card */
+  z-index: 2;
+}
+
+.ai-deck .card:nth-child(3) {
+  z-index: 3;
 }

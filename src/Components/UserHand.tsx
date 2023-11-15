@@ -18,7 +18,7 @@ interface UserHandProps {
 const UserHand: React.FC<UserHandProps> = ({ cards, coins }) => {
   return (
     <div className="user-deck">
-      <p>User</p>
+      <p>You</p>
       <div className="cards">
         {cards.map((card, index) => (
           <div key={index} className="card">
