@@ -21,9 +21,7 @@
   background-color: rgb(244, 194, 194);
   margin: 10%;
 }
-.card {
-  background-color: orange;
-}
+
 .board {
   display: flex;
   flex-direction: column;

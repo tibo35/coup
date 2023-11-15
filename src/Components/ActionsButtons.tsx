@@ -1,4 +1,5 @@
 import React from "react";
+import "./ActionsButtons.css";
 import { GameStore, PlayersState } from "../Store/GameStore";
 
 interface ActionsButtonsProps {
