@@ -1,21 +1,22 @@
 import React, { useEffect } from "react";
-import "../../App.css";
+import "./Board.css";
 import { observer, inject } from "mobx-react";
 import { GameStore } from "../../Store/GameStore";
 import AIStore from "../../Store/AIStore";
 import { CardType, Player, PlayersState } from "../../Store/GameStore";
 import ActionsButtons from "../ActionsButtons";
-
-interface AppProps {
+import AIHand from "../AIHand";
+import UserHand from "../UserHand";
+interface BoardProps {
   gameStore?: GameStore;
   aiStore?: AIStore;
 }
 
-const App = inject(
+const Board = inject(
   "gameStore",
   "aiStore"
 )(
-  observer(({ gameStore, aiStore }: AppProps) => {
+  observer(({ gameStore, aiStore }: BoardProps) => {
     // Use effect hook to manage side-effects and lifecycle events
     useEffect(() => {}, [gameStore]); // Now we depend on gameStore to react to changes
 
@@ -42,26 +43,23 @@ const App = inject(
     return (
       <div className="App">
         <div className="board">
-          {Object.entries(gameStore?.players ?? {}).map(
-            ([player, data], index) => (
-              <div key={index} className="deck">
-                <p>{player === "user" ? "User" : `Player ${index + 1}`}</p>
-                <div className="cards">
-                  {data.cards.map((card: CardType, cardIndex: number) => (
-                    <div key={cardIndex} className="card">
-                      Card {cardIndex + 1}: {card}
-                    </div>
-                  ))}
-                </div>
-                <div className="coins">Coins: {data.coins}</div>
-                <div className="current-player">
-                  Current Player:{" "}
-                  {gameStore?.gameState.currentPlayer === "user"
-                    ? "User"
-                    : gameStore?.gameState.currentPlayer || "None"}
-                </div>
-              </div>
-            )
+          <div className="ai-hands-container">
+            {Object.entries(gameStore?.players ?? {})
+              .filter(([player]) => player !== "user")
+              .map(([player, data], index) => (
+                <AIHand
+                  key={player}
+                  playerLabel={`Player ${index + 1}`}
+                  cards={data.cards}
+                  coins={data.coins}
+                />
+              ))}
+          </div>
+          {gameStore?.players?.user && (
+            <UserHand
+              cards={gameStore.players.user.cards as CardType[]}
+              coins={gameStore.players.user.coins}
+            />
           )}
         </div>
         <ActionsButtons gameStore={gameStore} />
@@ -69,5 +67,4 @@ const App = inject(
     );
   })
 );
-
-export default App;
+export default Board;

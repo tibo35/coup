@@ -1,0 +1,10 @@
+.board {
+  display: flex;
+  justify-content: space-between; /* This spreads out the child elements */
+}
+
+.ai-deck {
+  border: 1px solid red;
+  flex: 1; /* This makes each deck take equal space */
+  margin: 10px; /* Adjust as needed */
+}

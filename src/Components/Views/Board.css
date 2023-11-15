@@ -1,0 +1,54 @@
+.App {
+  text-align: center;
+  position: relative;
+  background-image: url("../../Assets/background/board.jpg");
+  background-size: cover; /* Scale the image to fit within the area */
+  background-repeat: no-repeat;
+  background-attachment: scroll; /* The background scrolls with the element */
+  width: 500px; /* Fixed width */
+  height: 1000px; /* Fixed height */
+  border-radius: 60px;
+  box-shadow: 80px 10px 10px 10px rgba(0, 0, 0, 0.5);
+  margin: auto; /* Center the app */
+}
+@media screen and (max-width: 769px) {
+  .App {
+    width: 380px;
+    height: 800px;
+  }
+}
+.deck {
+  background-color: rgb(244, 194, 194);
+  margin: 10%;
+}
+.card {
+  background-color: orange;
+}
+.board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 50%; /* Make sure the board takes full height */
+}
+
+/* AI hands container */
+.ai-hands-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%; /* Take full width to spread the AI hands */
+}
+
+.ai-deck {
+  /* Styles for AI decks */
+  border: 1px solid red;
+  margin: 10px;
+  /* Additional styles as needed */
+}
+
+.user-deck {
+  border: white 1px solid;
+  /* Styles for the user deck */
+  margin: 10px;
+  /* Additional styles as needed */
+}
