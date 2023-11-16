@@ -96,11 +96,11 @@ const ActionsButtons: React.FC<ActionsButtonsProps> = ({ gameStore }) => {
           <div className="actions-block">
             <button onClick={() => handleBlockAction("Block")}>Block</button>
             <button onClick={() => handleBlockAction("Pass")}>Pass</button>
+            <button onClick={() => handleBlockAction("Challenge")}>
+              Challenge
+            </button>{" "}
           </div>
         )}
-        <button onClick={() => handleBlockAction("Challenge")}>
-          Challenge
-        </button>
       </div>
     </div>
   );

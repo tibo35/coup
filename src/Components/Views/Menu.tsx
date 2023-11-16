@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./Menu.css";
+
 const Menu = () => {
   return (
     <div className="menu-container">
@@ -8,13 +9,19 @@ const Menu = () => {
       <nav>
         <ul>
           <li className="custom-btn btn-3">
-            <Link to="/play">Play</Link>
+            <Link to="/play" className="full-width-link">
+              Play
+            </Link>
           </li>
           <li className="custom-btn btn-3">
-            <Link to="/rules">Rules</Link>
+            <Link to="/rules" className="full-width-link">
+              Rules
+            </Link>
           </li>
           <li className="custom-btn btn-3">
-            <Link to="/settings">Settings</Link>
+            <Link to="/settings" className="full-width-link">
+              Settings
+            </Link>
           </li>
         </ul>
       </nav>

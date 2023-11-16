@@ -28,7 +28,6 @@ button {
   width: 130px;
   height: 40px;
   color: #fff;
-  border-radius: 5px;
   padding: 10px 25px;
   font-family: "Lato", sans-serif;
   font-weight: 500;
@@ -39,7 +38,6 @@ button {
   box-shadow: inset 2px 2px 2px 0px rgba(255, 255, 255, 0.5),
     7px 7px 20px 0px rgba(0, 0, 0, 0.1), 4px 4px 5px 0px rgba(0, 0, 0, 0.1);
   outline: none;
-  border-radius: 10px;
 }
 /* 3 */
 .btn-3 {
@@ -110,4 +108,12 @@ button {
 }
 .btn-3 span:hover:after {
   width: 100%;
+}
+.full-width-link {
+  display: block; /* Make Link take up the entire space of li */
+  text-align: center; /* Center the text */
+  color: inherit; /* Inherit text color */
+  text-decoration: none; /* Remove underline */
+  width: 100%; /* Take full width of the parent */
+  height: 100%; /* Take full height of the parent */
 }
