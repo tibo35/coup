@@ -18,6 +18,7 @@ const AIHand: React.FC<AIHandProps> = ({ playerLabel, cards, coins }) => {
   return (
     <div className="ai-deck">
       <p>{playerLabel}</p>
+      <div className="coins">Coins: {coins}</div>
       <div className="cards">
         {cards.map((card, index) => (
           <div key={index} className="card">
@@ -25,7 +26,6 @@ const AIHand: React.FC<AIHandProps> = ({ playerLabel, cards, coins }) => {
           </div>
         ))}
       </div>
-      <div className="coins">Coins: {coins}</div>
     </div>
   );
 };

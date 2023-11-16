@@ -1,13 +1,13 @@
 import React from "react";
 import "./ActionsButtons.css";
 import { GameStore, PlayersState } from "../Store/GameStore";
-
+import Buttons from "./Buttons";
 interface ActionsButtonsProps {
   gameStore?: GameStore;
 }
 
 const ActionsButtons: React.FC<ActionsButtonsProps> = ({ gameStore }) => {
-  const handleShuffleAndDeal = () => {
+  const handleStart = () => {
     gameStore?.shuffleAndDealCards();
   };
 
@@ -83,23 +83,25 @@ const ActionsButtons: React.FC<ActionsButtonsProps> = ({ gameStore }) => {
 
   return (
     <div className="actions-container">
-      <div className="actions-start">
-        <button onClick={handleShuffleAndDeal}>Start/Shuffle</button>
+      <div className="start">
+        <button onClick={handleStart}>Start</button>
       </div>
-      <div className="actions-turn">
+      <div className="actions ">
         <button onClick={handleTakeIncome}>Take Income</button>
         <button onClick={handleForeignAid}>Foreign Aid</button>
         <button onClick={handleTax}>Tax</button>
         <button onClick={handleCoup}>Coup</button>
         <button onClick={handleAssassinate}>Assassinate</button>
+        {gameStore?.blockWindowOpen && (
+          <div className="actions-block">
+            <button onClick={() => handleBlockAction("Block")}>Block</button>
+            <button onClick={() => handleBlockAction("Pass")}>Pass</button>
+          </div>
+        )}
+        <button onClick={() => handleBlockAction("Challenge")}>
+          Challenge
+        </button>
       </div>
-      {gameStore?.blockWindowOpen && (
-        <div className="actions-block">
-          <button onClick={() => handleBlockAction("Block")}>Block</button>
-          <button onClick={() => handleBlockAction("Pass")}>Pass</button>
-        </div>
-      )}
-      <button onClick={() => handleBlockAction("Challenge")}>Challenge</button>
     </div>
   );
 };

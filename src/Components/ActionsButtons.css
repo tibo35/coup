@@ -1,4 +1,15 @@
 .actions-container {
   margin-top: 160px; /* Increase space at the top */
   /* Other styles as needed */
+  border: red 1px solid;
+  display: flex;
+  flex-direction: column;
+}
+.start Buttons {
+  border: rgb(184, 189, 220) 2px solid;
+  width: 200px;
+}
+.action {
+  display: flex;
+  flex-direction: row;
 }

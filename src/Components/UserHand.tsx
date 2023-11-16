@@ -19,6 +19,7 @@ const UserHand: React.FC<UserHandProps> = ({ cards, coins }) => {
   return (
     <div className="user-deck">
       <p>You</p>
+      <div className="coins">Coins: {coins}</div>
       <div className="cards">
         {cards.map((card, index) => (
           <div key={index} className="card">
@@ -26,7 +27,6 @@ const UserHand: React.FC<UserHandProps> = ({ cards, coins }) => {
           </div>
         ))}
       </div>
-      <div className="coins">Coins: {coins}</div>
     </div>
   );
 };

@@ -13,12 +13,7 @@
   box-shadow: 20px 10px 10px 10px rgba(0, 0, 0, 0.5);
   margin: auto; /* Center the app */
 }
-@media screen and (max-width: 769px) {
-  .App {
-    width: 380px;
-    height: 800px;
-  }
-}
+
 .deck {
   background-color: rgb(244, 194, 194);
   margin: 10%;
