@@ -50,3 +50,29 @@
 .ai-deck .coins {
   margin-bottom: 30px; /* Add space above the coins area */
 }
+
+.ai-deck .card {
+  position: relative;
+  width: 80px; /* Adjust to match your card size */
+  height: 100px; /* Adjust to match your card size */
+  margin-right: -20px;
+  /* Other styles */
+}
+
+.card-image,
+.back-card-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  object-fit: cover;
+}
+
+.card-image {
+  z-index: 1;
+}
+
+.back-card-overlay {
+  z-index: 2;
+}

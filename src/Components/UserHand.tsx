@@ -9,7 +9,7 @@ const cardImages = {
   Contessa: require("../Assets/cards/contessa.png"),
   Ambassador: require("../Assets/cards/ambassador.png"),
 };
-const backCardImage = require("../Assets/cards/backCard.png");
+const backCardImage = require("../Assets/cards/backdeath.png");
 
 interface UserHandProps {
   cards: CardType[];
@@ -26,9 +26,14 @@ const UserHand: React.FC<UserHandProps> = ({ cards, coins, flippedCards }) => {
         {cards.map((card, index) => (
           <div key={index} className="card">
             <img
-              src={flippedCards[index] ? backCardImage : cardImages[card]}
+              className="front-card"
+              src={cardImages[card]}
               alt={card}
+              style={{ opacity: flippedCards[index] ? 0.5 : 1 }}
             />
+            {flippedCards[index] && (
+              <img className="back-card" src={backCardImage} alt="Card Back" />
+            )}
           </div>
         ))}
       </div>

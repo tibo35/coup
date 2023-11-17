@@ -2,28 +2,36 @@
   border: grey 1px solid;
   border-radius: 30px;
   padding: 10px; /* Add some padding */
-  height: 290px;
+  min-height: 290px;
   width: 350px;
   margin: 10px;
 }
 
-.user-deck .cards {
-  /* Set a minimum size for the container */
-  min-width: 170px; /* For example, slightly larger than one card width + margin */
-  min-height: 320px; /* Slightly larger than one card height + margin */
-  display: flex;
-  flex-wrap: wrap; /* Allows cards to wrap to the next line if needed */
-}
-
 .user-deck .card {
   width: 150px;
-  height: 200px;
+  min-height: 200px;
   margin: 10px;
   display: inline-block;
+  position: relative; /* Make this a relative container for absolute child elements */
 }
 
 .user-deck .card img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.front-card {
+  z-index: 1; /* Ensures this image is above the back card */
+}
+
+.back-card {
+  z-index: 2; /* Ensures this image is above the front card */
+  width: 50px !important; /* Adjust the width as needed */
+  margin-left: 15px;
+  margin-top: -20px;
+  height: 100px !important; /* Adjust the height as needed */
 }
