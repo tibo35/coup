@@ -57,14 +57,18 @@ export class GameStore {
   isChallengeActive = false;
   challenger: keyof PlayersState | null = null;
   challengedPlayer: keyof PlayersState | null = null;
-
+  currentMessage = "Ready?";
   constructor() {
     makeAutoObservable(this);
     this.players.player1.flippedCards = [false, false];
     this.players.player2.flippedCards = [false, false];
     this.players.user.flippedCards = [false, false];
   }
-
+  // Method to emit messages
+  @action
+  emitMessage(message: string) {
+    this.currentMessage = message;
+  }
   @action
   setNextPlayer() {
     this.gameState.currentPlayer = this.getNextPlayer();
@@ -74,7 +78,6 @@ export class GameStore {
   shuffleAndDealCards() {
     const cardTypes = ["Duke", "Captain", "Assassin", "Contessa", "Ambassador"];
     let deck: string[] = [];
-
     // Populate the deck with the card types
     cardTypes.forEach((type) => {
       for (let i = 0; i < 3; i++) {
@@ -84,7 +87,6 @@ export class GameStore {
 
     // Shuffle the deck using Fisher-Yates shuffle
     shuffleArray(deck);
-
     // Deal two cards to each player
     const updatedPlayers: PlayersState = {
       player1: {
@@ -115,7 +117,10 @@ export class GameStore {
       Math.floor(Math.random() * 2) + 1
     }` as keyof PlayersState;
     this.gameState.currentPlayer = startingPlayer;
-
+    this.emitMessage(`Game Started`);
+    setTimeout(() => {
+      this.emitMessage(`${startingPlayer} it's your turn!`);
+    }, 1000);
     console.log("START - First Player: " + startingPlayer);
   }
 
@@ -131,6 +136,7 @@ export class GameStore {
       console.log("take income");
       this.players[playerKey].actionHistory.push({ action: "Take Income" });
     }
+    this.emitMessage(`${playerKey} took income.`);
     this.openBlockWindow("Income");
   }
 
@@ -146,6 +152,8 @@ export class GameStore {
       console.log("take foreign aid");
       this.players[playerKey].actionHistory.push({ action: "Take ForeignAid" });
     }
+    this.emitMessage(`${playerKey} took Foregin Aid.`);
+
     this.openBlockWindow("Foreign Aid");
   }
 
@@ -161,6 +169,8 @@ export class GameStore {
       console.log("take tax");
       this.players[playerKey].actionHistory.push({ action: "Take Tax" });
     }
+    this.emitMessage(`${playerKey} took Tax.`);
+
     this.openBlockWindow("Tax");
   }
 
@@ -187,9 +197,16 @@ export class GameStore {
       assassinPlayer.coins -= 3; // Deduct the cost of assassination
       if (targetPlayer.cards.length > 0) {
         // Flip the last card of the target player
-        if (targetPlayer.cards.length > 0) {
-          const cardIndex = targetPlayer.cards.length - 1;
-          targetPlayer.flippedCards[cardIndex] = true; // Set the last card as flipped
+        const firstUnflippedIndex = targetPlayer.flippedCards.findIndex(
+          (flipped) => !flipped
+        );
+        if (firstUnflippedIndex !== -1) {
+          targetPlayer.flippedCards[firstUnflippedIndex] = true;
+          console.log(
+            `Flipping card at index ${firstUnflippedIndex} for ${targetPlayerKey}`
+          );
+        } else {
+          console.log(`${targetPlayerKey} has no more cards to flip.`);
         }
       }
       console.log(

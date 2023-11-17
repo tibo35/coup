@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./Board.css";
 import { observer, inject } from "mobx-react";
 import { GameStore } from "../../Store/GameStore";
@@ -17,6 +17,7 @@ const Board = inject(
   "aiStore"
 )(
   observer(({ gameStore, aiStore }: BoardProps) => {
+    const [instruction, setInstruction] = useState("Welcome to the game!");
     // Use effect hook to manage side-effects and lifecycle events
     useEffect(() => {}, [gameStore]); // Now we depend on gameStore to react to changes
 
@@ -26,6 +27,12 @@ const Board = inject(
         // Update UI based on block window state
       }
     }, [gameStore?.blockWindowOpen]);
+    useEffect(() => {
+      if (gameStore) {
+        // React to changes in the currentMessage
+        setInstruction(gameStore.currentMessage);
+      }
+    }, [gameStore?.currentMessage]);
     // AI action logic
     useEffect(() => {
       if (
@@ -56,6 +63,7 @@ const Board = inject(
                 />
               ))}
           </div>
+
           {gameStore?.players?.user && (
             <UserHand
               cards={gameStore.players.user.cards as CardType[]}
@@ -64,6 +72,7 @@ const Board = inject(
             />
           )}
         </div>
+        <div className="instruction">{instruction}</div>
         <ActionsButtons gameStore={gameStore} />
       </div>
     );
