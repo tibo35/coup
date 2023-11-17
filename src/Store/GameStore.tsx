@@ -137,7 +137,9 @@ export class GameStore {
       this.players[playerKey].actionHistory.push({ action: "Take Income" });
     }
     this.emitMessage(`${playerKey} took income.`);
-    this.openBlockWindow("Income");
+    setTimeout(() => {
+      this.openBlockWindow("Income");
+    }, 2000);
   }
 
   @action
@@ -154,7 +156,9 @@ export class GameStore {
     }
     this.emitMessage(`${playerKey} took Foregin Aid.`);
 
-    this.openBlockWindow("Foreign Aid");
+    setTimeout(() => {
+      this.openBlockWindow("Foreign Aid");
+    }, 2000);
   }
 
   @action
@@ -171,7 +175,9 @@ export class GameStore {
     }
     this.emitMessage(`${playerKey} took Tax.`);
 
-    this.openBlockWindow("Tax");
+    setTimeout(() => {
+      this.openBlockWindow("Tax");
+    }, 2000);
   }
 
   @action
@@ -186,15 +192,15 @@ export class GameStore {
       targetPlayer.cards.length === 0 ||
       targetPlayer.flippedCards.every((flipped) => flipped)
     ) {
-      console.log(`${targetPlayerKey} has no cards left to be assassinated.`);
-      alert(
+      this.emitMessage(
         `${targetPlayerKey} cannot be assassinated as they have no cards left.`
       );
+
       return;
     }
 
     if (assassinPlayer.coins >= 3) {
-      assassinPlayer.coins -= 3; // Deduct the cost of assassination
+      assassinPlayer.coins -= 3;
       if (targetPlayer.cards.length > 0) {
         // Flip the last card of the target player
         const firstUnflippedIndex = targetPlayer.flippedCards.findIndex(
@@ -202,9 +208,6 @@ export class GameStore {
         );
         if (firstUnflippedIndex !== -1) {
           targetPlayer.flippedCards[firstUnflippedIndex] = true;
-          console.log(
-            `Flipping card at index ${firstUnflippedIndex} for ${targetPlayerKey}`
-          );
         } else {
           console.log(`${targetPlayerKey} has no more cards to flip.`);
         }
@@ -212,12 +215,19 @@ export class GameStore {
       console.log(
         `${assassinPlayerKey} has assassinated a card from ${targetPlayerKey}`
       );
+      this.emitMessage(
+        `${assassinPlayerKey} has assassinated a card from ${targetPlayerKey}`
+      );
       // Any additional logic (such as changing turns) can go here
       // You might also need to handle what happens if the assassination is challenged
     } else {
-      alert("You cannot assassinate because you do not have enough coins.");
+      this.emitMessage(
+        `You can't Assassinate because you don't have enough coins`
+      );
     }
-    this.openBlockWindow("Assassination");
+    setTimeout(() => {
+      this.openBlockWindow("Assassination");
+    }, 2000);
   }
 
   @action
@@ -237,14 +247,16 @@ export class GameStore {
       targetPlayer.cards.length === 0 ||
       targetPlayer.flippedCards.every((flipped) => flipped)
     ) {
-      console.log(`${targetPlayerKey} has no cards left to coup.`);
-      alert(`${targetPlayerKey} cannot be couped as they have no cards left.`);
+      console.log(`${targetPlayerKey} cannot be couped as they lost already.`);
+      this.emitMessage(
+        `${targetPlayerKey} cannot be couped as they lost already.`
+      );
       return;
     }
 
     // Check if the current player has enough coins to coup
     if (currentPlayer.coins < 7) {
-      alert("You cannot coup because you don't have enough coins.");
+      this.emitMessage(`You cannot coup because you don't have enough coins.`);
       return;
     }
 
@@ -258,17 +270,16 @@ export class GameStore {
       );
       if (firstUnflippedIndex !== -1) {
         targetPlayer.flippedCards[firstUnflippedIndex] = true;
-        console.log(
-          `Flipping card at index ${firstUnflippedIndex} for ${targetPlayerKey}`
-        );
       } else {
         console.log(`${targetPlayerKey} has no more cards to flip.`);
       }
     }
+    this.emitMessage(
+      `${currentPlayerKey} has successfully couped ${targetPlayerKey}`
+    );
     console.log(
       `${currentPlayerKey} has successfully couped ${targetPlayerKey}`
     );
-
     // Move to the next player
     this.setNextPlayer();
   }
@@ -290,20 +301,26 @@ export class GameStore {
         nextPlayer.flippedCards.some((flipped) => !flipped);
 
       if (hasPlayableCards) {
+        this.emitMessage(`${nextPlayerKey} It's your turn!`);
         console.log("Next player:", nextPlayerKey);
+        setTimeout(() => {
+          return nextPlayerKey;
+        }, 2000);
         return nextPlayerKey;
       }
     }
-
     console.log("No valid players remaining.");
-    alert("Player " + this.gameState.currentPlayer + " has won the game!");
-    return null; // Return null if no valid players are found
+    this.emitMessage(
+      `Player " + this.gameState.currentPlayer + " has won the game!`
+    );
+    return null;
   }
 
   @action
   openBlockWindow(actionType: string) {
     this.blockWindowOpen = true;
     this.currentActionType = actionType;
+    this.emitMessage(`Accept or Block?`);
     console.log(`Block window open for ${actionType}.`);
     if (this.gameState.currentPlayer === "user") {
       this.aiStore?.decideOnBlockChallenge("user", actionType);
@@ -400,6 +417,10 @@ export class GameStore {
 
   blockForeignAid(blockingPlayerKey: keyof PlayersState) {
     if (this.players[blockingPlayerKey].cards.includes("Duke")) {
+      this.emitMessage(
+        `${blockingPlayerKey} has blocked foreign aid with the Duke card.`
+      );
+
       console.log(
         `${blockingPlayerKey} has blocked foreign aid with the Duke card.`
       );
