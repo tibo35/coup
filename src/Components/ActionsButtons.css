@@ -2,12 +2,36 @@
   /* Other styles as needed */
   display: flex;
   flex-direction: column;
+  justify-content: center; /* Centers children vertically */
+  align-items: center; /* Centers children horizontally */
 }
 
-.action {
+.actions,
+.actions-block {
   display: flex;
-  flex-direction: row;
+  justify-content: center; /* Centers content horizontally */
+  align-items: center; /* Centers content vertically */
+  background-color: rgba(167, 143, 246, 0.3);
+  height: 100px; /* Adjust height as needed */
+  width: 100%; /* Adjust width as needed */
+  animation: slideInFromTop 0s ease-out forwards;
+  z-index: 1;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
 }
-.actions-container button {
+
+.actions button,
+.actions-block button {
   margin: 5px;
+}
+
+@keyframes slideInFromTop {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }

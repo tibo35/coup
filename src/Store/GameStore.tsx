@@ -7,16 +7,14 @@ export type ActionHistory = {
   claimedCard?: CardType;
 };
 export type Player = {
-  cards: string[];
+  cards: CardType[];
   coins: number;
   actionHistory: ActionHistory[]; // New property to track player actions
   flippedCards: boolean[];
 };
 
 export interface PlayersState {
-  player1: Player;
-  player2: Player;
-  user: Player;
+  [key: string]: Player;
 }
 export type CardType =
   | "Duke"
@@ -51,19 +49,40 @@ export class GameStore {
     currentPlayer: "user",
   };
 
-  blockWindowOpen = false; // New property to track if block window is open
-  currentActionType: string | null = null; // New property to track the current action type being blocked
-
+  //variables
+  blockWindowOpen = false;
+  currentActionType: string | null = null;
+  cardsDealt = false;
   isChallengeActive = false;
+  actionButtons = true;
   challenger: keyof PlayersState | null = null;
   challengedPlayer: keyof PlayersState | null = null;
   currentMessage = "Ready?";
+
   constructor() {
     makeAutoObservable(this);
     this.players.player1.flippedCards = [false, false];
     this.players.player2.flippedCards = [false, false];
     this.players.user.flippedCards = [false, false];
   }
+
+  @action
+  setPlayerName(name: string) {
+    if (!this.players.user) return; // Check if 'user' player exists
+
+    // Rename the 'user' key to the actual player's name
+    const userPlayer = this.players.user;
+    this.players[name] = userPlayer;
+
+    // Remove the 'user' key
+    delete this.players.user; // It's now safe to delete as we already moved the data
+
+    // Update currentPlayer if it was 'user'
+    if (this.gameState.currentPlayer === "user") {
+      this.gameState.currentPlayer = name;
+    }
+  }
+
   // Method to emit messages
   @action
   emitMessage(message: string) {
@@ -71,38 +90,56 @@ export class GameStore {
   }
   @action
   setNextPlayer() {
+    const nextPlayer = this.getNextPlayer();
+    if (nextPlayer === "user") {
+      // Replace 'userName' with the dynamic user name
+      this.setActionInitiated(false);
+    }
     this.gameState.currentPlayer = this.getNextPlayer();
   }
 
   @action
+  setActionInitiated(initiated: boolean) {
+    this.actionButtons = initiated;
+  }
+
+  @action
   shuffleAndDealCards() {
-    const cardTypes = ["Duke", "Captain", "Assassin", "Contessa", "Ambassador"];
-    let deck: string[] = [];
+    const cardTypes: CardType[] = [
+      "Duke",
+      "Captain",
+      "Assassin",
+      "Contessa",
+      "Ambassador",
+    ];
+    let deck: CardType[] = [];
+
     // Populate the deck with the card types
-    cardTypes.forEach((type) => {
+    cardTypes.forEach((cardType) => {
       for (let i = 0; i < 3; i++) {
-        deck.push(type);
+        deck.push(cardType);
       }
     });
 
-    // Shuffle the deck using Fisher-Yates shuffle
+    // Shuffle the deck
     shuffleArray(deck);
+    this.cardsDealt = true;
     // Deal two cards to each player
     const updatedPlayers: PlayersState = {
       player1: {
-        cards: [deck.pop()!, deck.pop()!],
+        cards: [deck.pop() as CardType, deck.pop() as CardType],
         coins: 2,
         actionHistory: [],
         flippedCards: [false, false],
       },
       player2: {
-        cards: [deck.pop()!, deck.pop()!],
+        cards: [deck.pop() as CardType, deck.pop() as CardType],
         coins: 2,
         actionHistory: [],
         flippedCards: [false, false],
       },
       user: {
-        cards: [deck.pop()!, deck.pop()!],
+        cards: [deck.pop() as CardType, deck.pop() as CardType],
         coins: 2,
         actionHistory: [],
         flippedCards: [false, false],
@@ -118,6 +155,7 @@ export class GameStore {
     }` as keyof PlayersState;
     this.gameState.currentPlayer = startingPlayer;
     this.emitMessage(`Game Started`);
+
     setTimeout(() => {
       this.emitMessage(`${startingPlayer} it's your turn!`);
     }, 1000);
@@ -136,6 +174,7 @@ export class GameStore {
       console.log("take income");
       this.players[playerKey].actionHistory.push({ action: "Take Income" });
     }
+    this.setActionInitiated(true);
     this.emitMessage(`${playerKey} took income.`);
     setTimeout(() => {
       this.openBlockWindow("Income");
@@ -154,6 +193,7 @@ export class GameStore {
       console.log("take foreign aid");
       this.players[playerKey].actionHistory.push({ action: "Take ForeignAid" });
     }
+    this.setActionInitiated(true);
     this.emitMessage(`${playerKey} took Foregin Aid.`);
 
     setTimeout(() => {
@@ -173,6 +213,7 @@ export class GameStore {
       console.log("take tax");
       this.players[playerKey].actionHistory.push({ action: "Take Tax" });
     }
+    this.setActionInitiated(true);
     this.emitMessage(`${playerKey} took Tax.`);
 
     setTimeout(() => {
@@ -225,6 +266,7 @@ export class GameStore {
         `You can't Assassinate because you don't have enough coins`
       );
     }
+    this.setActionInitiated(true);
     setTimeout(() => {
       this.openBlockWindow("Assassination");
     }, 2000);
@@ -280,7 +322,7 @@ export class GameStore {
     console.log(
       `${currentPlayerKey} has successfully couped ${targetPlayerKey}`
     );
-    // Move to the next player
+    this.setActionInitiated(true);
     this.setNextPlayer();
   }
 
@@ -320,7 +362,9 @@ export class GameStore {
   openBlockWindow(actionType: string) {
     this.blockWindowOpen = true;
     this.currentActionType = actionType;
-    this.emitMessage(`Accept or Block?`);
+    this.emitMessage(
+      `${this.gameState.currentPlayer} wants to take: ${this.currentActionType}\nAccept or Block?`
+    );
     console.log(`Block window open for ${actionType}.`);
     if (this.gameState.currentPlayer === "user") {
       this.aiStore?.decideOnBlockChallenge("user", actionType);

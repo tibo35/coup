@@ -72,8 +72,10 @@ const Board = inject(
             />
           )}
         </div>
-        <div className="instruction">{instruction}</div>
-        <ActionsButtons gameStore={gameStore} />
+        <div className="game-actions">
+          <div className="instruction message">{instruction}</div>
+          <ActionsButtons gameStore={gameStore} />
+        </div>
       </div>
     );
   })
