@@ -196,24 +196,37 @@ class AIStore {
       );
     }
   }
-  decideOnBlockChallenge(aiPlayerKey: keyof PlayersState, actionType: string) {
-    if (this.gameStore.gameState.currentPlayer) {
-      if (this.shouldChallengeBlock(aiPlayerKey, actionType)) {
-        // AI decides to challenge the block
-        this.gameStore.initiateChallenge(
-          aiPlayerKey,
-          this.gameStore.gameState.currentPlayer
-        );
-      } else {
-        // AI accepts the block and reverts the action without losing a card
-        this.gameStore.revertAction(
-          this.gameStore.gameState.currentPlayer,
-          actionType
-        );
-        //this.gameStore.setNextPlayer();
-      }
+
+  decideOnBlockChallenge(
+    challengedPlayerKey: keyof PlayersState,
+    actionType: string
+  ) {
+    console.log(
+      `AI deciding on block challenge. Current player: ${this.gameStore.gameState.currentPlayer}`
+    );
+    if (this.gameStore.gameState.currentPlayer === "user") {
+      console.log("AI is passing the user's action.");
+      this.gameStore.closeBlockWindow();
+      this.gameStore.setNextPlayer(); // No argument needed
     } else {
-      console.error("Error: Current player is null.");
+      // Existing logic for AI decision making
+      if (this.shouldChallengeBlock(challengedPlayerKey, actionType)) {
+        // Ensure the currentPlayer is not null before initiating a challenge
+        if (this.gameStore.gameState.currentPlayer) {
+          this.gameStore.initiateChallenge(
+            challengedPlayerKey,
+            this.gameStore.gameState.currentPlayer
+          );
+        }
+      } else {
+        // Ensure the currentPlayer is not null before reverting the action
+        if (this.gameStore.gameState.currentPlayer) {
+          this.gameStore.revertAction(
+            this.gameStore.gameState.currentPlayer,
+            actionType
+          );
+        }
+      }
     }
   }
 

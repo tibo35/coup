@@ -235,6 +235,9 @@ export class GameStore {
     this.blockWindowOpen = true;
     this.currentActionType = actionType;
     console.log(`Block window open for ${actionType}.`);
+    if (this.gameState.currentPlayer === "user") {
+      this.aiStore?.decideOnBlockChallenge("user", actionType);
+    }
   }
 
   @action
