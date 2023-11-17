@@ -76,3 +76,8 @@
 .back-card-overlay {
   z-index: 2;
 }
+.death-card img {
+  background: aliceblue;
+  opacity: 0.3;
+  border-radius: 10px;
+}

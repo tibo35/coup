@@ -352,9 +352,7 @@ export class GameStore {
       }
     }
     console.log("No valid players remaining.");
-    this.emitMessage(
-      `Player " + this.gameState.currentPlayer + " has won the game!`
-    );
+    this.emitMessage(` ${this.gameState.currentPlayer} + " has won the game!`);
     return null;
   }
 
