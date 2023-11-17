@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { CardType } from "../Store/GameStore";
 import "./AIHandStyle.css";
 
@@ -6,6 +6,7 @@ interface AIHandProps {
   playerLabel: string;
   cards: CardType[];
   coins: number;
+  flippedCards: boolean[];
 }
 const cardImages = {
   Duke: require("../Assets/cards/duke.png"),
@@ -14,7 +15,14 @@ const cardImages = {
   Contessa: require("../Assets/cards/contessa.png"),
   Ambassador: require("../Assets/cards/ambassador.png"),
 };
-const AIHand: React.FC<AIHandProps> = ({ playerLabel, cards, coins }) => {
+const backCardImage = require("../Assets/cards/backCard.png");
+
+const AIHand: React.FC<AIHandProps> = ({
+  playerLabel,
+  cards,
+  coins,
+  flippedCards,
+}) => {
   return (
     <div className="ai-deck">
       <p>{playerLabel}</p>
@@ -22,7 +30,10 @@ const AIHand: React.FC<AIHandProps> = ({ playerLabel, cards, coins }) => {
       <div className="cards">
         {cards.map((card, index) => (
           <div key={index} className="card">
-            <img src={cardImages[card]} alt={card} />
+            <img
+              src={flippedCards[index] ? cardImages[card] : backCardImage}
+              alt={card}
+            />
           </div>
         ))}
       </div>

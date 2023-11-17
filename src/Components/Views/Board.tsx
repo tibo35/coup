@@ -52,6 +52,7 @@ const Board = inject(
                   playerLabel={`Player ${index + 1}`}
                   cards={data.cards}
                   coins={data.coins}
+                  flippedCards={data.flippedCards} // Pass the flippedCards array
                 />
               ))}
           </div>
@@ -59,6 +60,7 @@ const Board = inject(
             <UserHand
               cards={gameStore.players.user.cards as CardType[]}
               coins={gameStore.players.user.coins}
+              flippedCards={gameStore.players.user.flippedCards} // Pass the flippedCards array
             />
           )}
         </div>

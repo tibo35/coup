@@ -10,6 +10,7 @@ export type Player = {
   cards: string[];
   coins: number;
   actionHistory: ActionHistory[]; // New property to track player actions
+  flippedCards: boolean[];
 };
 
 export interface PlayersState {
@@ -41,9 +42,9 @@ export class GameStore {
     this.aiStore = aiStore;
   }
   players: PlayersState = {
-    player1: { cards: [], coins: 2, actionHistory: [] },
-    player2: { cards: [], coins: 2, actionHistory: [] },
-    user: { cards: [], coins: 2, actionHistory: [] },
+    player1: { cards: [], coins: 2, actionHistory: [], flippedCards: [] },
+    player2: { cards: [], coins: 2, actionHistory: [], flippedCards: [] },
+    user: { cards: [], coins: 2, actionHistory: [], flippedCards: [] },
   };
 
   gameState: GameState = {
@@ -59,6 +60,9 @@ export class GameStore {
 
   constructor() {
     makeAutoObservable(this);
+    this.players.player1.flippedCards = [false, false];
+    this.players.player2.flippedCards = [false, false];
+    this.players.user.flippedCards = [false, false];
   }
 
   @action
@@ -87,13 +91,20 @@ export class GameStore {
         cards: [deck.pop()!, deck.pop()!],
         coins: 2,
         actionHistory: [],
+        flippedCards: [false, false],
       },
       player2: {
         cards: [deck.pop()!, deck.pop()!],
         coins: 2,
         actionHistory: [],
+        flippedCards: [false, false],
       },
-      user: { cards: [deck.pop()!, deck.pop()!], coins: 2, actionHistory: [] },
+      user: {
+        cards: [deck.pop()!, deck.pop()!],
+        coins: 2,
+        actionHistory: [],
+        flippedCards: [false, false],
+      },
     };
 
     // Update the players in the store
@@ -160,11 +171,26 @@ export class GameStore {
   ) {
     const assassinPlayer = this.players[assassinPlayerKey];
     const targetPlayer = this.players[targetPlayerKey];
+    // prevent assassination on loser
+    if (
+      targetPlayer.cards.length === 0 ||
+      targetPlayer.flippedCards.every((flipped) => flipped)
+    ) {
+      console.log(`${targetPlayerKey} has no cards left to be assassinated.`);
+      alert(
+        `${targetPlayerKey} cannot be assassinated as they have no cards left.`
+      );
+      return;
+    }
 
     if (assassinPlayer.coins >= 3) {
       assassinPlayer.coins -= 3; // Deduct the cost of assassination
       if (targetPlayer.cards.length > 0) {
-        targetPlayer.cards.pop(); // Assume we simply remove the last card
+        // Flip the last card of the target player
+        if (targetPlayer.cards.length > 0) {
+          const cardIndex = targetPlayer.cards.length - 1;
+          targetPlayer.flippedCards[cardIndex] = true; // Set the last card as flipped
+        }
       }
       console.log(
         `${assassinPlayerKey} has assassinated a card from ${targetPlayerKey}`
@@ -189,6 +215,16 @@ export class GameStore {
     const currentPlayer = this.players[currentPlayerKey];
     const targetPlayer = this.players[targetPlayerKey];
 
+    //prevent coup on loser:
+    if (
+      targetPlayer.cards.length === 0 ||
+      targetPlayer.flippedCards.every((flipped) => flipped)
+    ) {
+      console.log(`${targetPlayerKey} has no cards left to coup.`);
+      alert(`${targetPlayerKey} cannot be couped as they have no cards left.`);
+      return;
+    }
+
     // Check if the current player has enough coins to coup
     if (currentPlayer.coins < 7) {
       alert("You cannot coup because you don't have enough coins.");
@@ -197,10 +233,21 @@ export class GameStore {
 
     // Deduct coins and remove a card from the target player
     currentPlayer.coins -= 7;
-    if (targetPlayer.cards.length > 0) {
-      targetPlayer.cards.pop(); // This is a simplification
-    }
 
+    // Flip the last card of the target player
+    if (targetPlayer.cards.length > 0) {
+      const firstUnflippedIndex = targetPlayer.flippedCards.findIndex(
+        (flipped) => !flipped
+      );
+      if (firstUnflippedIndex !== -1) {
+        targetPlayer.flippedCards[firstUnflippedIndex] = true;
+        console.log(
+          `Flipping card at index ${firstUnflippedIndex} for ${targetPlayerKey}`
+        );
+      } else {
+        console.log(`${targetPlayerKey} has no more cards to flip.`);
+      }
+    }
     console.log(
       `${currentPlayerKey} has successfully couped ${targetPlayerKey}`
     );
@@ -219,12 +266,18 @@ export class GameStore {
       const nextIndex = (currentIndex + i) % playerOrder.length;
       const nextPlayerKey = playerOrder[nextIndex];
 
-      // Check if the next player has cards left
-      if (this.players[nextPlayerKey].cards.length > 0) {
+      // Check if the next player has playable cards
+      const nextPlayer = this.players[nextPlayerKey];
+      const hasPlayableCards =
+        nextPlayer.cards.length > 0 &&
+        nextPlayer.flippedCards.some((flipped) => !flipped);
+
+      if (hasPlayableCards) {
         console.log("Next player:", nextPlayerKey);
         return nextPlayerKey;
       }
     }
+
     console.log("No valid players remaining.");
     alert("Player " + this.gameState.currentPlayer + " has won the game!");
     return null; // Return null if no valid players are found

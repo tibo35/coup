@@ -52,6 +52,13 @@ class AIStore {
     // Get a list of potential targets, excluding the current player
     const potentialTargets = Object.keys(this.gameStore.players)
       .filter((key) => key !== currentPlayerKey)
+      .filter((key) => {
+        const player = this.gameStore.players[key as keyof PlayersState];
+        return (
+          player.cards.length > 0 &&
+          !player.flippedCards.every((flipped) => flipped)
+        );
+      })
       .map((key) => key as keyof PlayersState);
 
     if (potentialTargets.length === 0) {

@@ -9,13 +9,15 @@ const cardImages = {
   Contessa: require("../Assets/cards/contessa.png"),
   Ambassador: require("../Assets/cards/ambassador.png"),
 };
+const backCardImage = require("../Assets/cards/backCard.png");
 
 interface UserHandProps {
   cards: CardType[];
   coins: number;
+  flippedCards: boolean[];
 }
 
-const UserHand: React.FC<UserHandProps> = ({ cards, coins }) => {
+const UserHand: React.FC<UserHandProps> = ({ cards, coins, flippedCards }) => {
   return (
     <div className="user-deck">
       <p>You</p>
@@ -23,7 +25,10 @@ const UserHand: React.FC<UserHandProps> = ({ cards, coins }) => {
       <div className="cards">
         {cards.map((card, index) => (
           <div key={index} className="card">
-            <img src={cardImages[card]} alt={card} />
+            <img
+              src={flippedCards[index] ? backCardImage : cardImages[card]}
+              alt={card}
+            />
           </div>
         ))}
       </div>
