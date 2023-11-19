@@ -28,6 +28,9 @@ const ActionsButtons: React.FC<ActionsButtonsProps> = ({ gameStore }) => {
       gameStore.getTax(gameStore.gameState.currentPlayer);
     }
   };
+  const isUsersTurn = () => {
+    return gameStore?.gameState.currentPlayer === "user";
+  };
 
   const handleAssassinate = () => {
     const currentPlayerKey = gameStore?.gameState.currentPlayer;
@@ -88,8 +91,8 @@ const ActionsButtons: React.FC<ActionsButtonsProps> = ({ gameStore }) => {
           <button onClick={handleStart}>Start</button>
         </div>
       )}
-      {!gameStore?.blockWindowOpen &&
-        !gameStore?.actionButtons &&
+      {isUsersTurn() &&
+        !gameStore?.blockWindowOpen &&
         gameStore?.cardsDealt && (
           <div className="actions">
             <button onClick={handleTakeIncome}>Take Income</button>
@@ -99,7 +102,6 @@ const ActionsButtons: React.FC<ActionsButtonsProps> = ({ gameStore }) => {
             <button onClick={handleAssassinate}>Assassinate </button>
           </div>
         )}
-
       {gameStore?.blockWindowOpen && (
         <div className="actions-block">
           <button onClick={() => handleBlockAction("Pass")}>Accept</button>

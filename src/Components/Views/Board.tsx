@@ -18,34 +18,33 @@ const Board = inject(
 )(
   observer(({ gameStore, aiStore }: BoardProps) => {
     const [instruction, setInstruction] = useState("Welcome to the game!");
-    // Use effect hook to manage side-effects and lifecycle events
-    useEffect(() => {}, [gameStore]); // Now we depend on gameStore to react to changes
-
-    useEffect(() => {
-      // React to changes in blockWindowOpen or other relevant state variables
-      if (gameStore?.blockWindowOpen) {
-        // Update UI based on block window state
-      }
-    }, [gameStore?.blockWindowOpen]);
+    // Handle updates to the current message
     useEffect(() => {
       if (gameStore) {
-        // React to changes in the currentMessage
         setInstruction(gameStore.currentMessage);
       }
     }, [gameStore?.currentMessage]);
-    // AI action logic
+
+    // Handle AI actions
     useEffect(() => {
+      let aiActionDelay: number | undefined;
+
       if (
         gameStore?.gameState.currentPlayer &&
         gameStore.gameState.currentPlayer !== "user"
       ) {
-        const aiActionDelay = setTimeout(() => {
-          aiStore?.AITurn(); // Call aiTakeAction from AIStore
-        }, 1000); // AI will "think" for 1 second
-
-        return () => clearTimeout(aiActionDelay);
+        aiActionDelay = window.setTimeout(() => {
+          aiStore?.AITurn();
+        }, 1000);
       }
-    }, [gameStore?.gameState.currentPlayer, aiStore]);
+
+      // Cleanup
+      return () => {
+        if (aiActionDelay !== undefined) {
+          clearTimeout(aiActionDelay);
+        }
+      };
+    }, [gameStore, aiStore, gameStore?.gameState.currentPlayer]);
 
     return (
       <div className="App">

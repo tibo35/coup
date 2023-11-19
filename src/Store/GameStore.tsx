@@ -40,9 +40,9 @@ export class GameStore {
     this.aiStore = aiStore;
   }
   players: PlayersState = {
-    player1: { cards: [], coins: 2, actionHistory: [], flippedCards: [] },
-    player2: { cards: [], coins: 2, actionHistory: [], flippedCards: [] },
-    user: { cards: [], coins: 2, actionHistory: [], flippedCards: [] },
+    player1: { cards: [], coins: 0, actionHistory: [], flippedCards: [] },
+    player2: { cards: [], coins: 0, actionHistory: [], flippedCards: [] },
+    user: { cards: [], coins: 0, actionHistory: [], flippedCards: [] },
   };
 
   gameState: GameState = {
@@ -96,6 +96,7 @@ export class GameStore {
       this.setActionInitiated(false);
     }
     this.gameState.currentPlayer = this.getNextPlayer();
+    this.closeBlockWindow();
   }
 
   @action
@@ -178,7 +179,7 @@ export class GameStore {
     this.emitMessage(`${playerKey} took income.`);
     setTimeout(() => {
       this.openBlockWindow("Income");
-    }, 2000);
+    }, 1000);
   }
 
   @action
@@ -198,7 +199,7 @@ export class GameStore {
 
     setTimeout(() => {
       this.openBlockWindow("Foreign Aid");
-    }, 2000);
+    }, 1000);
   }
 
   @action
@@ -218,7 +219,7 @@ export class GameStore {
 
     setTimeout(() => {
       this.openBlockWindow("Tax");
-    }, 2000);
+    }, 1000);
   }
 
   @action
@@ -269,7 +270,7 @@ export class GameStore {
     this.setActionInitiated(true);
     setTimeout(() => {
       this.openBlockWindow("Assassination");
-    }, 2000);
+    }, 1000);
   }
 
   @action
@@ -347,7 +348,7 @@ export class GameStore {
         console.log("Next player:", nextPlayerKey);
         setTimeout(() => {
           return nextPlayerKey;
-        }, 2000);
+        }, 1000);
         return nextPlayerKey;
       }
     }
@@ -427,7 +428,8 @@ export class GameStore {
       case "Foreign Aid":
         player.coins -= 2; // Revert foreign aid action
         break;
-      // Add cases for other actions as needed
+      case "Tax":
+        player.coins -= 3; // Revert tax action
     }
     this.setNextPlayer();
   }
