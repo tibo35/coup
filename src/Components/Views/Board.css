@@ -7,8 +7,8 @@
   background-size: cover; /* Scale the image to fit within the area */
   background-repeat: no-repeat;
   background-attachment: scroll; /* The background scrolls with the element */
-  width: 100%; /* Fixed width */
-  height: 1000px; /* Fixed height */
+  width: 100vw; /* Fixed width */
+  height: 100vh; /* Fixed height */
   border-radius: 12px;
   box-shadow: 20px 10px 10px 10px rgba(0, 0, 0, 0.5);
   margin: auto; /* Center the app */
@@ -30,7 +30,6 @@
 .ai-hands-container {
   display: flex;
   justify-content: space-between;
-  width: 90%; /* Adjust the width as needed */
   margin: auto;
 }
 .instruction {

@@ -3,9 +3,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 100%; /* Set width to 100% of the viewport */
-  height: 100vh; /* Set height to 100% of the viewport height */
-  max-width: 428px; /* Maximum width */
   margin: auto; /* Center the menu-container horizontally */
   padding: 20px; /* Optional: Add some padding inside the container */
   box-sizing: border-box; /* Include padding in the width and height */
@@ -31,14 +28,6 @@ ul li {
 .menu-container ul li a {
   text-decoration: none;
   color: inherit;
-}
-
-/* Responsive adjustments for smaller screens */
-@media (max-width: 428px) {
-  .menu-container {
-    width: 100%; /* Full width on smaller screens */
-    max-width: none; /* Override max-width */
-  }
 }
 
 /* -----------button---------*/
