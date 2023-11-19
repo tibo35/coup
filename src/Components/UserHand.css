@@ -14,7 +14,7 @@
   position: relative;
 }
 .user-deck .card:hover {
-  transform: scale(1.1); /* Slightly enlarge card on hover */
+  transform: scale(1.1);
 }
 .user-deck .card img {
   width: 100%;

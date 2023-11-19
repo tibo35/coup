@@ -1,24 +1,24 @@
 .ai-deck {
   flex: 1;
   padding: 10px;
-  display: flex; /* Use flexbox for layout */
-  flex-direction: column; /* Stack elements vertically */
-  align-items: center; /* Center-align items */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .ai-deck .cards {
   display: flex;
   align-items: center;
-  justify-content: center; /* Center the cards horizontally */
+  justify-content: center;
   min-width: 160px;
   min-height: 100px;
   position: relative;
   margin: 20px 0;
-  cursor: pointer; /* Change cursor to indicate it's clickable */
-  transition: transform 0.3s; /* Add transition for flipping effect */
+  cursor: pointer;
+  transition: transform 0.3s;
 }
 .ai-deck .card:hover {
-  transform: scale(1.1); /* Slightly enlarge card on hover */
+  transform: scale(1.1);
 }
 .ai-deck .card {
   margin-right: -20px;
@@ -47,15 +47,14 @@
 }
 
 .ai-deck .coins {
-  margin-bottom: 5px; /* Add space above the coins area */
+  margin-bottom: 5px;
 }
 
 .ai-deck .card {
   position: relative;
-  width: 80px; /* Adjust to match your card size */
-  height: 100px; /* Adjust to match your card size */
+  width: 80px;
+  height: 100px;
   margin-right: -20px;
-  /* Other styles */
 }
 
 .card-image,
