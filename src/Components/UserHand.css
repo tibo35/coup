@@ -4,6 +4,7 @@
   min-height: 290px;
   width: 350px;
   margin: 0 10px;
+  line-height: 5px;
 }
 
 .user-deck .card {
