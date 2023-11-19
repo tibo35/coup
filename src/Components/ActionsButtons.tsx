@@ -95,8 +95,8 @@ const ActionsButtons: React.FC<ActionsButtonsProps> = ({ gameStore }) => {
         !gameStore?.blockWindowOpen &&
         gameStore?.cardsDealt && (
           <div className="actions">
-            <button onClick={handleTakeIncome}>Take Income</button>
-            <button onClick={handleForeignAid}>Foreign Aid</button>
+            <button onClick={handleTakeIncome}>Income</button>
+            <button onClick={handleForeignAid}>Foreignaid</button>
             <button onClick={handleTax}>Tax</button>
             <button onClick={handleCoup}>Coup</button>
             <button onClick={handleAssassinate}>Assassinate </button>
