@@ -1,19 +1,19 @@
 .actions-container {
-  /* Other styles as needed */
+  width: 350px;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Centers children vertically */
-  align-items: center; /* Centers children horizontally */
+  justify-content: center;
+  align-items: center;
 }
 
 .actions,
 .actions-block {
   display: flex;
-  justify-content: center; /* Centers content horizontally */
-  align-items: center; /* Centers content vertically */
+  justify-content: center;
+  align-items: center;
   background-color: rgba(167, 143, 246, 0.3);
-  height: 100px; /* Adjust height as needed */
-  width: 100%; /* Adjust width as needed */
+  height: 100px;
+  width: 100%;
   animation: slideInFromTop 0s ease-out forwards;
   z-index: 1;
   border-bottom-right-radius: 5px;
