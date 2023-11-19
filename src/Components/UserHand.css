@@ -1,10 +1,9 @@
 .user-deck {
   border: grey 1px solid;
   border-radius: 30px;
-  padding: 10px; /* Add some padding */
   min-height: 290px;
   width: 350px;
-  margin: 10px;
+  margin: 0 10px;
 }
 
 .user-deck .card {
