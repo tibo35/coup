@@ -54,6 +54,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 160px 15px 10px 15px;
+  margin: 130px 15px 10px 15px;
   height: 170px;
+}
+@media screen and (max-width: 608px) {
+  .game-actions {
+    margin: 190px 15px 10px 15px;
+  }
 }
