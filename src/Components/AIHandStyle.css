@@ -13,7 +13,7 @@
   min-width: 160px;
   min-height: 100px;
   position: relative;
-
+  margin: 20px 0;
   cursor: pointer; /* Change cursor to indicate it's clickable */
   transition: transform 0.3s; /* Add transition for flipping effect */
 }

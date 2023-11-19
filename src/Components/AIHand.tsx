@@ -30,8 +30,6 @@ const AIHand: React.FC<AIHandProps> = ({
 
   return (
     <div className="ai-deck">
-      <p>{playerLabel}</p>
-      <div className="coins">Coins: {coins}</div>
       <div className="cards">
         {isDead ? (
           <div className="card death-card">
@@ -48,6 +46,8 @@ const AIHand: React.FC<AIHandProps> = ({
           ))
         )}
       </div>
+      <p>{playerLabel}</p>
+      <div className="coins">Coins: {coins}</div>
     </div>
   );
 };
