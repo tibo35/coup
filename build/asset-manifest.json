@@ -1,0 +1,24 @@
+{
+  "files": {
+    "main.css": "/static/css/main.1aa4ea22.css",
+    "main.js": "/static/js/main.926fbbaf.js",
+    "static/js/787.23f6e91d.chunk.js": "/static/js/787.23f6e91d.chunk.js",
+    "static/media/backCard.png": "/static/media/backCard.c532fb8e9bb899bacdb1.png",
+    "static/media/duke.png": "/static/media/duke.ec6fb4242ce46b718c7a.png",
+    "static/media/captain.png": "/static/media/captain.2845265f25431c90d97e.png",
+    "static/media/contessa.png": "/static/media/contessa.2ff9b2815deb95735e31.png",
+    "static/media/ambassador.png": "/static/media/ambassador.d66148bca82e3889ced2.png",
+    "static/media/assassin.png": "/static/media/assassin.f3b74fc616d6ca21a3ca.png",
+    "static/media/board.jpg": "/static/media/board.8a217106b91ab2c6ebc8.jpg",
+    "static/media/app back.jpg": "/static/media/app back.74b9db733735005d474a.jpg",
+    "static/media/backdeath.png": "/static/media/backdeath.eeca8a9800cec8939325.png",
+    "index.html": "/index.html",
+    "main.1aa4ea22.css.map": "/static/css/main.1aa4ea22.css.map",
+    "main.926fbbaf.js.map": "/static/js/main.926fbbaf.js.map",
+    "787.23f6e91d.chunk.js.map": "/static/js/787.23f6e91d.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1aa4ea22.css",
+    "static/js/main.926fbbaf.js"
+  ]
+}
