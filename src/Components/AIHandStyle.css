@@ -1,0 +1,83 @@
+.ai-deck {
+  flex: 1;
+  margin: 20px;
+  padding: 10px;
+  display: flex; /* Use flexbox for layout */
+  flex-direction: column; /* Stack elements vertically */
+  align-items: center; /* Center-align items */
+}
+
+.ai-deck .cards {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center the cards horizontally */
+  min-width: 160px;
+  min-height: 100px;
+  position: relative;
+
+  cursor: pointer; /* Change cursor to indicate it's clickable */
+  transition: transform 0.3s; /* Add transition for flipping effect */
+}
+.ai-deck .card:hover {
+  transform: scale(1.1); /* Slightly enlarge card on hover */
+}
+.ai-deck .card {
+  margin-right: -20px;
+  position: relative;
+  z-index: 1;
+  height: 100px;
+}
+
+.ai-deck .card img {
+  width: 80px;
+  height: auto;
+  object-fit: contain;
+}
+
+.ai-deck .card:nth-child(1) {
+  z-index: 1;
+}
+
+.ai-deck .card:nth-child(2) {
+  margin-top: -20px;
+  z-index: 2;
+}
+
+.ai-deck .card:nth-child(3) {
+  z-index: 3;
+}
+
+.ai-deck .coins {
+  margin-bottom: 30px; /* Add space above the coins area */
+}
+
+.ai-deck .card {
+  position: relative;
+  width: 80px; /* Adjust to match your card size */
+  height: 100px; /* Adjust to match your card size */
+  margin-right: -20px;
+  /* Other styles */
+}
+
+.card-image,
+.back-card-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  object-fit: cover;
+}
+
+.card-image {
+  z-index: 1;
+}
+
+.back-card-overlay {
+  z-index: 2;
+}
+.death-card img {
+  background: aliceblue;
+  opacity: 0.3;
+  border-radius: 10px;
+}

@@ -7,15 +7,14 @@ export type ActionHistory = {
   claimedCard?: CardType;
 };
 export type Player = {
-  cards: string[];
+  cards: CardType[];
   coins: number;
   actionHistory: ActionHistory[]; // New property to track player actions
+  flippedCards: boolean[];
 };
 
 export interface PlayersState {
-  player1: Player;
-  player2: Player;
-  user: Player;
+  [key: string]: Player;
 }
 export type CardType =
   | "Duke"
@@ -41,59 +40,111 @@ export class GameStore {
     this.aiStore = aiStore;
   }
   players: PlayersState = {
-    player1: { cards: [], coins: 2, actionHistory: [] },
-    player2: { cards: [], coins: 2, actionHistory: [] },
-    user: { cards: [], coins: 2, actionHistory: [] },
+    player1: { cards: [], coins: 0, actionHistory: [], flippedCards: [] },
+    player2: { cards: [], coins: 0, actionHistory: [], flippedCards: [] },
+    user: { cards: [], coins: 0, actionHistory: [], flippedCards: [] },
   };
 
   gameState: GameState = {
     currentPlayer: "user",
   };
 
-  blockWindowOpen = false; // New property to track if block window is open
-  currentActionType: string | null = null; // New property to track the current action type being blocked
-
+  //variables
+  blockWindowOpen = false;
+  currentActionType: string | null = null;
+  cardsDealt = false;
   isChallengeActive = false;
+  actionButtons = true;
   challenger: keyof PlayersState | null = null;
   challengedPlayer: keyof PlayersState | null = null;
+  currentMessage = "Ready?";
 
   constructor() {
     makeAutoObservable(this);
+    this.players.player1.flippedCards = [false, false];
+    this.players.player2.flippedCards = [false, false];
+    this.players.user.flippedCards = [false, false];
   }
 
   @action
+  setPlayerName(name: string) {
+    if (!this.players.user) return; // Check if 'user' player exists
+
+    // Rename the 'user' key to the actual player's name
+    const userPlayer = this.players.user;
+    this.players[name] = userPlayer;
+
+    // Remove the 'user' key
+    delete this.players.user; // It's now safe to delete as we already moved the data
+
+    // Update currentPlayer if it was 'user'
+    if (this.gameState.currentPlayer === "user") {
+      this.gameState.currentPlayer = name;
+    }
+  }
+
+  // Method to emit messages
+  @action
+  emitMessage(message: string) {
+    this.currentMessage = message;
+  }
+  @action
   setNextPlayer() {
+    const nextPlayer = this.getNextPlayer();
+    if (nextPlayer === "user") {
+      // Replace 'userName' with the dynamic user name
+      this.setActionInitiated(false);
+    }
     this.gameState.currentPlayer = this.getNextPlayer();
+    this.closeBlockWindow();
+  }
+
+  @action
+  setActionInitiated(initiated: boolean) {
+    this.actionButtons = initiated;
   }
 
   @action
   shuffleAndDealCards() {
-    const cardTypes = ["Duke", "Captain", "Assassin", "Contessa", "Ambassador"];
-    let deck: string[] = [];
+    const cardTypes: CardType[] = [
+      "Duke",
+      "Captain",
+      "Assassin",
+      "Contessa",
+      "Ambassador",
+    ];
+    let deck: CardType[] = [];
 
     // Populate the deck with the card types
-    cardTypes.forEach((type) => {
+    cardTypes.forEach((cardType) => {
       for (let i = 0; i < 3; i++) {
-        deck.push(type);
+        deck.push(cardType);
       }
     });
 
-    // Shuffle the deck using Fisher-Yates shuffle
+    // Shuffle the deck
     shuffleArray(deck);
-
+    this.cardsDealt = true;
     // Deal two cards to each player
     const updatedPlayers: PlayersState = {
       player1: {
-        cards: [deck.pop()!, deck.pop()!],
+        cards: [deck.pop() as CardType, deck.pop() as CardType],
         coins: 2,
         actionHistory: [],
+        flippedCards: [false, false],
       },
       player2: {
-        cards: [deck.pop()!, deck.pop()!],
+        cards: [deck.pop() as CardType, deck.pop() as CardType],
         coins: 2,
         actionHistory: [],
+        flippedCards: [false, false],
       },
-      user: { cards: [deck.pop()!, deck.pop()!], coins: 2, actionHistory: [] },
+      user: {
+        cards: [deck.pop() as CardType, deck.pop() as CardType],
+        coins: 2,
+        actionHistory: [],
+        flippedCards: [false, false],
+      },
     };
 
     // Update the players in the store
@@ -104,7 +155,11 @@ export class GameStore {
       Math.floor(Math.random() * 2) + 1
     }` as keyof PlayersState;
     this.gameState.currentPlayer = startingPlayer;
+    this.emitMessage(`Game Started`);
 
+    setTimeout(() => {
+      this.emitMessage(`${startingPlayer} it's your turn!`);
+    }, 1000);
     console.log("START - First Player: " + startingPlayer);
   }
 
@@ -120,7 +175,11 @@ export class GameStore {
       console.log("take income");
       this.players[playerKey].actionHistory.push({ action: "Take Income" });
     }
-    this.openBlockWindow("Income");
+    this.setActionInitiated(true);
+    this.emitMessage(`${playerKey} took income.`);
+    setTimeout(() => {
+      this.openBlockWindow("Income");
+    }, 1000);
   }
 
   @action
@@ -135,7 +194,12 @@ export class GameStore {
       console.log("take foreign aid");
       this.players[playerKey].actionHistory.push({ action: "Take ForeignAid" });
     }
-    this.openBlockWindow("Foreign Aid");
+    this.setActionInitiated(true);
+    this.emitMessage(`${playerKey} took Foregin Aid.`);
+
+    setTimeout(() => {
+      this.openBlockWindow("Foreign Aid");
+    }, 1000);
   }
 
   @action
@@ -150,7 +214,12 @@ export class GameStore {
       console.log("take tax");
       this.players[playerKey].actionHistory.push({ action: "Take Tax" });
     }
-    this.openBlockWindow("Tax");
+    this.setActionInitiated(true);
+    this.emitMessage(`${playerKey} took Tax.`);
+
+    setTimeout(() => {
+      this.openBlockWindow("Tax");
+    }, 1000);
   }
 
   @action
@@ -160,21 +229,48 @@ export class GameStore {
   ) {
     const assassinPlayer = this.players[assassinPlayerKey];
     const targetPlayer = this.players[targetPlayerKey];
+    // prevent assassination on loser
+    if (
+      targetPlayer.cards.length === 0 ||
+      targetPlayer.flippedCards.every((flipped) => flipped)
+    ) {
+      this.emitMessage(
+        `${targetPlayerKey} cannot be assassinated as they have no cards left.`
+      );
+
+      return;
+    }
 
     if (assassinPlayer.coins >= 3) {
-      assassinPlayer.coins -= 3; // Deduct the cost of assassination
+      assassinPlayer.coins -= 3;
       if (targetPlayer.cards.length > 0) {
-        targetPlayer.cards.pop(); // Assume we simply remove the last card
+        // Flip the last card of the target player
+        const firstUnflippedIndex = targetPlayer.flippedCards.findIndex(
+          (flipped) => !flipped
+        );
+        if (firstUnflippedIndex !== -1) {
+          targetPlayer.flippedCards[firstUnflippedIndex] = true;
+        } else {
+          console.log(`${targetPlayerKey} has no more cards to flip.`);
+        }
       }
       console.log(
+        `${assassinPlayerKey} has assassinated a card from ${targetPlayerKey}`
+      );
+      this.emitMessage(
         `${assassinPlayerKey} has assassinated a card from ${targetPlayerKey}`
       );
       // Any additional logic (such as changing turns) can go here
       // You might also need to handle what happens if the assassination is challenged
     } else {
-      alert("You cannot assassinate because you do not have enough coins.");
+      this.emitMessage(
+        `You can't Assassinate because you don't have enough coins`
+      );
     }
-    this.openBlockWindow("Assassination");
+    this.setActionInitiated(true);
+    setTimeout(() => {
+      this.openBlockWindow("Assassination");
+    }, 1000);
   }
 
   @action
@@ -189,23 +285,45 @@ export class GameStore {
     const currentPlayer = this.players[currentPlayerKey];
     const targetPlayer = this.players[targetPlayerKey];
 
+    //prevent coup on loser:
+    if (
+      targetPlayer.cards.length === 0 ||
+      targetPlayer.flippedCards.every((flipped) => flipped)
+    ) {
+      console.log(`${targetPlayerKey} cannot be couped as they lost already.`);
+      this.emitMessage(
+        `${targetPlayerKey} cannot be couped as they lost already.`
+      );
+      return;
+    }
+
     // Check if the current player has enough coins to coup
     if (currentPlayer.coins < 7) {
-      alert("You cannot coup because you don't have enough coins.");
+      this.emitMessage(`You cannot coup because you don't have enough coins.`);
       return;
     }
 
     // Deduct coins and remove a card from the target player
     currentPlayer.coins -= 7;
-    if (targetPlayer.cards.length > 0) {
-      targetPlayer.cards.pop(); // This is a simplification
-    }
 
+    // Flip the last card of the target player
+    if (targetPlayer.cards.length > 0) {
+      const firstUnflippedIndex = targetPlayer.flippedCards.findIndex(
+        (flipped) => !flipped
+      );
+      if (firstUnflippedIndex !== -1) {
+        targetPlayer.flippedCards[firstUnflippedIndex] = true;
+      } else {
+        console.log(`${targetPlayerKey} has no more cards to flip.`);
+      }
+    }
+    this.emitMessage(
+      `${currentPlayerKey} has successfully couped ${targetPlayerKey}`
+    );
     console.log(
       `${currentPlayerKey} has successfully couped ${targetPlayerKey}`
     );
-
-    // Move to the next player
+    this.setActionInitiated(true);
     this.setNextPlayer();
   }
 
@@ -219,22 +337,37 @@ export class GameStore {
       const nextIndex = (currentIndex + i) % playerOrder.length;
       const nextPlayerKey = playerOrder[nextIndex];
 
-      // Check if the next player has cards left
-      if (this.players[nextPlayerKey].cards.length > 0) {
+      // Check if the next player has playable cards
+      const nextPlayer = this.players[nextPlayerKey];
+      const hasPlayableCards =
+        nextPlayer.cards.length > 0 &&
+        nextPlayer.flippedCards.some((flipped) => !flipped);
+
+      if (hasPlayableCards) {
+        this.emitMessage(`${nextPlayerKey} It's your turn!`);
         console.log("Next player:", nextPlayerKey);
+        setTimeout(() => {
+          return nextPlayerKey;
+        }, 1000);
         return nextPlayerKey;
       }
     }
     console.log("No valid players remaining.");
-    alert("Player " + this.gameState.currentPlayer + " has won the game!");
-    return null; // Return null if no valid players are found
+    this.emitMessage(` ${this.gameState.currentPlayer} + " has won the game!`);
+    return null;
   }
 
   @action
   openBlockWindow(actionType: string) {
     this.blockWindowOpen = true;
     this.currentActionType = actionType;
+    this.emitMessage(
+      `${this.gameState.currentPlayer} wants to take: ${this.currentActionType}\nAccept or Block?`
+    );
     console.log(`Block window open for ${actionType}.`);
+    if (this.gameState.currentPlayer === "user") {
+      this.aiStore?.decideOnBlockChallenge("user", actionType);
+    }
   }
 
   @action
@@ -295,7 +428,8 @@ export class GameStore {
       case "Foreign Aid":
         player.coins -= 2; // Revert foreign aid action
         break;
-      // Add cases for other actions as needed
+      case "Tax":
+        player.coins -= 3; // Revert tax action
     }
     this.setNextPlayer();
   }
@@ -327,6 +461,10 @@ export class GameStore {
 
   blockForeignAid(blockingPlayerKey: keyof PlayersState) {
     if (this.players[blockingPlayerKey].cards.includes("Duke")) {
+      this.emitMessage(
+        `${blockingPlayerKey} has blocked foreign aid with the Duke card.`
+      );
+
       console.log(
         `${blockingPlayerKey} has blocked foreign aid with the Duke card.`
       );

@@ -52,6 +52,13 @@ class AIStore {
     // Get a list of potential targets, excluding the current player
     const potentialTargets = Object.keys(this.gameStore.players)
       .filter((key) => key !== currentPlayerKey)
+      .filter((key) => {
+        const player = this.gameStore.players[key as keyof PlayersState];
+        return (
+          player.cards.length > 0 &&
+          !player.flippedCards.every((flipped) => flipped)
+        );
+      })
       .map((key) => key as keyof PlayersState);
 
     if (potentialTargets.length === 0) {
@@ -196,24 +203,37 @@ class AIStore {
       );
     }
   }
-  decideOnBlockChallenge(aiPlayerKey: keyof PlayersState, actionType: string) {
-    if (this.gameStore.gameState.currentPlayer) {
-      if (this.shouldChallengeBlock(aiPlayerKey, actionType)) {
-        // AI decides to challenge the block
-        this.gameStore.initiateChallenge(
-          aiPlayerKey,
-          this.gameStore.gameState.currentPlayer
-        );
-      } else {
-        // AI accepts the block and reverts the action without losing a card
-        this.gameStore.revertAction(
-          this.gameStore.gameState.currentPlayer,
-          actionType
-        );
-        //this.gameStore.setNextPlayer();
-      }
+
+  decideOnBlockChallenge(
+    challengedPlayerKey: keyof PlayersState,
+    actionType: string
+  ) {
+    console.log(
+      `AI deciding on block challenge. Current player: ${this.gameStore.gameState.currentPlayer}`
+    );
+    if (this.gameStore.gameState.currentPlayer === "user") {
+      console.log("AI is passing the user's action.");
+      this.gameStore.closeBlockWindow();
+      this.gameStore.setNextPlayer(); // No argument needed
     } else {
-      console.error("Error: Current player is null.");
+      // Existing logic for AI decision making
+      if (this.shouldChallengeBlock(challengedPlayerKey, actionType)) {
+        // Ensure the currentPlayer is not null before initiating a challenge
+        if (this.gameStore.gameState.currentPlayer) {
+          this.gameStore.initiateChallenge(
+            challengedPlayerKey,
+            this.gameStore.gameState.currentPlayer
+          );
+        }
+      } else {
+        // Ensure the currentPlayer is not null before reverting the action
+        if (this.gameStore.gameState.currentPlayer) {
+          this.gameStore.revertAction(
+            this.gameStore.gameState.currentPlayer,
+            actionType
+          );
+        }
+      }
     }
   }
 
