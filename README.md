@@ -1,68 +1,72 @@
 Live: https://coup-746b.onrender.com/
 
-## Available Scripts
+Coup - The Game
 
-In the project directory, you can run:
+Coup is a captivating card game that blends strategy, bluffing, and resource management. This project is a digital adaptation of the popular board game, allowing players to experience the thrill of Coup on their devices. Built with React and MobX, it provides an interactive and engaging gameplay experience.
+Features
 
-### `npm start`
+    Interactive gameplay with a sleek user interface.
+    Single-player mode against AI opponents.
+    Responsive design for both desktop and mobile platforms.
+    Real-time gameplay updates using MobX state management.
+    Custom animations and transitions for a more immersive experience.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Installation
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+To run Coup on your local machine, follow these steps:
 
-### `npm test`
+    Clone the repository:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+    bash
 
-### `npm run build`
+git clone https://github.com/your-username/coup.git
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Navigate to the project directory:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+bash
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+cd coup
 
-### `npm run eject`
+Install the dependencies:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+bash
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+npm install
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Start the application:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+bash
 
-## Learn More
+    npm start
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+    This will run the app in development mode. Open http://localhost:3000 to view it in your browser.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Gameplay
 
-### Code Splitting
+    At the start, each player is dealt two influence cards (face down) and two coins.
+    Players take turns and can perform actions such as taking income, foreign aid, coups, and more.
+    Actions can be challenged or blocked by other players, leading to bluffs and strategic plays.
+    The goal is to eliminate the influence of all other players and be the last one standing.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Built With
 
-### Analyzing the Bundle Size
+    React - A JavaScript library for building user interfaces.
+    MobX - Simple, scalable state management.
+    TypeScript - A typed superset of JavaScript that compiles to plain JavaScript.
+    React Router - Declarative routing for React apps.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Contributing
 
-### Making a Progressive Web App
+Contributions are what make the open-source community such a fantastic place to learn, inspire, and create. Any contributions you make are greatly appreciated.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+    Fork the Project
+    Create your Feature Branch (git checkout -b feature/AmazingFeature)
+    Commit your Changes (git commit -m 'Add some AmazingFeature')
+    Push to the Branch (git push origin feature/AmazingFeature)
+    Open a Pull Request
 
-### Advanced Configuration
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-### Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This project is a digital representation of the Coup game and is intended for educational and entertainment purposes only.
