@@ -1,7 +1,7 @@
 import React from "react";
 import "./ActionsButtons.css";
 import { GameStore, PlayersState } from "../Store/GameStore";
-import Buttons from "./Buttons";
+import "./Button.css";
 interface ActionsButtonsProps {
   gameStore?: GameStore;
 }
@@ -87,26 +87,52 @@ const ActionsButtons: React.FC<ActionsButtonsProps> = ({ gameStore }) => {
   return (
     <div className="actions-container">
       {!gameStore?.cardsDealt && (
-        <div className="start">
-          <button onClick={handleStart}>Start</button>
+        <div className="start actions">
+          <button className="button-73" onClick={handleStart}>
+            Start
+          </button>
         </div>
       )}
       {isUsersTurn() &&
         !gameStore?.blockWindowOpen &&
         gameStore?.cardsDealt && (
           <div className="actions">
-            <button onClick={handleTakeIncome}>Income</button>
-            <button onClick={handleForeignAid}>Foreignaid</button>
-            <button onClick={handleTax}>Tax</button>
-            <button onClick={handleCoup}>Coup</button>
-            <button onClick={handleAssassinate}>Assassinate </button>
+            <div>
+              <button className="button-73" onClick={handleTakeIncome}>
+                Income
+              </button>
+              <button className="button-73" onClick={handleForeignAid}>
+                Foreignaid
+              </button>
+              <button className="button-73" onClick={handleTax}>
+                Tax
+              </button>
+            </div>
+            <div>
+              <button className="button-73" onClick={handleCoup}>
+                Coup
+              </button>
+              <button className="button-73" onClick={handleAssassinate}>
+                Assassinate{" "}
+              </button>
+            </div>
           </div>
         )}
       {gameStore?.blockWindowOpen && (
-        <div className="actions-block">
-          <button onClick={() => handleBlockAction("Pass")}>Accept</button>
-          <button onClick={() => handleBlockAction("Block")}>Block</button>
-          <button onClick={() => handleBlockAction("Challenge")}>
+        <div className="actions">
+          <button
+            className="button-73"
+            onClick={() => handleBlockAction("Pass")}>
+            Accept
+          </button>
+          <button
+            className="button-73"
+            onClick={() => handleBlockAction("Block")}>
+            Block
+          </button>
+          <button
+            className="button-73"
+            onClick={() => handleBlockAction("Challenge")}>
             Challenge
           </button>
         </div>

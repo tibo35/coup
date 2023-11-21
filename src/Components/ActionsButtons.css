@@ -9,10 +9,12 @@
 .actions,
 .actions-block {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   background-color: rgba(167, 143, 246, 0.3);
-  height: 100px;
+  height: 100%;
+  padding: 3%;
   width: 100%;
   animation: slideInFromTop 0s ease-out forwards;
   z-index: 1;
