@@ -34,7 +34,7 @@ function shuffleArray(array: any[]) {
 }
 
 export class GameStore {
-  aiStore?: AIStore; // Add aiStore as an optional property
+  aiStore?: AIStore;
 
   setAIStore(aiStore: AIStore) {
     this.aiStore = aiStore;
@@ -57,7 +57,7 @@ export class GameStore {
   actionButtons = true;
   challenger: keyof PlayersState | null = null;
   challengedPlayer: keyof PlayersState | null = null;
-  currentMessage = "Ready?";
+  currentMessage = "Click Start to play";
 
   constructor() {
     makeAutoObservable(this);
@@ -177,9 +177,7 @@ export class GameStore {
     }
     this.setActionInitiated(true);
     this.emitMessage(`${playerKey} took income.`);
-    setTimeout(() => {
-      this.openBlockWindow("Income");
-    }, 1000);
+    this.openBlockWindow("Income");
   }
 
   @action
@@ -197,9 +195,7 @@ export class GameStore {
     this.setActionInitiated(true);
     this.emitMessage(`${playerKey} took Foregin Aid.`);
 
-    setTimeout(() => {
-      this.openBlockWindow("Foreign Aid");
-    }, 1000);
+    this.openBlockWindow("Foreign Aid");
   }
 
   @action
@@ -217,9 +213,7 @@ export class GameStore {
     this.setActionInitiated(true);
     this.emitMessage(`${playerKey} took Tax.`);
 
-    setTimeout(() => {
-      this.openBlockWindow("Tax");
-    }, 1000);
+    this.openBlockWindow("Tax");
   }
 
   @action
@@ -268,9 +262,7 @@ export class GameStore {
       );
     }
     this.setActionInitiated(true);
-    setTimeout(() => {
-      this.openBlockWindow("Assassination");
-    }, 1000);
+    this.openBlockWindow("Assassination");
   }
 
   @action
@@ -353,7 +345,7 @@ export class GameStore {
       }
     }
     console.log("No valid players remaining.");
-    this.emitMessage(` ${this.gameState.currentPlayer} + " has won the game!`);
+    this.emitMessage(` ${this.gameState.currentPlayer} has won the game!`);
     return null;
   }
 
@@ -426,10 +418,10 @@ export class GameStore {
     const player = this.players[playerKey];
     switch (actionType) {
       case "Foreign Aid":
-        player.coins -= 2; // Revert foreign aid action
+        player.coins -= 2;
         break;
       case "Tax":
-        player.coins -= 3; // Revert tax action
+        player.coins -= 3;
     }
     this.setNextPlayer();
   }
@@ -477,7 +469,6 @@ export class GameStore {
     }
   }
 
-  // test
   @action
   initiateChallenge(
     challengerKey: keyof PlayersState,

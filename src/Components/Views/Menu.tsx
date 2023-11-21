@@ -8,20 +8,14 @@ const Menu = () => {
       <h1>COUP</h1>
       <nav>
         <ul>
-          <li className="custom-btn btn-3">
-            <Link to="/play" className="full-width-link">
-              Play
-            </Link>
+          <li className="button-73">
+            <Link to="/play">Play</Link>
           </li>
-          <li className="custom-btn btn-3">
-            <Link to="/rules" className="full-width-link">
-              Rules
-            </Link>
+          <li className="button-73">
+            <Link to="/rules">Rules</Link>
           </li>
-          <li className="custom-btn btn-3">
-            <Link to="/settings" className="full-width-link">
-              Settings
-            </Link>
+          <li className="button-73">
+            <Link to="/settings">Settings</Link>
           </li>
         </ul>
       </nav>
