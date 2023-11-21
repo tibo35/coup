@@ -25,15 +25,13 @@ ul {
 }
 
 ul li {
-  margin: 30px 0;
+  margin: 20px 0;
 }
 
 .menu-container ul li a {
   text-decoration: none;
-  color: inherit;
 }
 ul .button-73 {
-  margin: 10px;
   width: 200px;
   font-size: 1rem;
 }
